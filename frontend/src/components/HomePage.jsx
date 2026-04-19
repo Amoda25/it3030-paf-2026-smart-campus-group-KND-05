@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Building2, 
   CalendarCheck2, 
@@ -37,55 +38,12 @@ const HomePage = () => {
             UniHub is a role-based platform designed to manage facility bookings, maintenance requests, and campus workflows efficiently.
           </p>
           <div className="flex items-center justify-center gap-4">
-            <a href="/register" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)' }}>
+            <Link to="/register" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)' }}>
               Start Learning
-            </a>
-            <a href="/courses" className="btn btn-outline" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', color: 'white', borderColor: 'rgba(255, 255, 255, 0.3)' }}>
+            </Link>
+            <Link to="/courses" className="btn btn-outline" style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', color: 'white', borderColor: 'rgba(255, 255, 255, 0.3)' }}>
               View Courses
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Overlapping Feature Cards */}
-      <section id="features" style={{ position: 'relative', zIndex: 10, marginTop: '-120px', paddingBottom: '80px' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', maxWidth: '900px', width: '100%' }}>
-            {/* Card 1 */}
-            <div className="feature-card" style={{ background: '#ffffff', textAlign: 'center', padding: '3rem 2rem', borderRadius: '24px', boxShadow: '0 15px 45px rgba(0, 0, 0, 0.08)', transition: 'all 0.3s ease' }}>
-              <div style={{ width: '64px', height: '64px', background: '#ffffff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto', color: '#2563eb', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)' }}>
-                <CalendarCheck2 size={28} strokeWidth={2.5} />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e3a8a', marginBottom: '1rem' }}>Booking Management</h3>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.6 }}>Request and manage room, lab, and equipment bookings with automated conflict prevention.</p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="feature-card" style={{ background: '#ffffff', textAlign: 'center', padding: '3rem 2rem', borderRadius: '24px', boxShadow: '0 15px 45px rgba(0, 0, 0, 0.08)', transition: 'all 0.3s ease' }}>
-              <div style={{ width: '64px', height: '64px', background: '#ffffff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto', color: '#10b981', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)' }}>
-                <Wrench size={28} strokeWidth={2.5} />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e3a8a', marginBottom: '1rem' }}>Maintenance System</h3>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.6 }}>Report issues with resources and track ticket status from Open to Closed in real-time.</p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="feature-card" style={{ background: '#ffffff', textAlign: 'center', padding: '3rem 2rem', borderRadius: '24px', boxShadow: '0 15px 45px rgba(0, 0, 0, 0.08)', transition: 'all 0.3s ease' }}>
-              <div style={{ width: '64px', height: '64px', background: '#ffffff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto', color: '#f59e0b', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)' }}>
-                <Lock size={28} strokeWidth={2.5} />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e3a8a', marginBottom: '1rem' }}>Secure Authentication</h3>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.6 }}>Enterprise-grade security featuring JWT-based login and robust role validation mechanisms.</p>
-            </div>
-
-            {/* Card 4 */}
-            <div className="feature-card" style={{ background: '#ffffff', textAlign: 'center', padding: '3rem 2rem', borderRadius: '24px', boxShadow: '0 15px 45px rgba(0, 0, 0, 0.08)', transition: 'all 0.3s ease' }}>
-              <div style={{ width: '64px', height: '64px', background: '#ffffff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto', color: '#8b5cf6', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)' }}>
-                <Users size={28} strokeWidth={2.5} />
-              </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e3a8a', marginBottom: '1rem' }}>Role-Based Dashboards</h3>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: 1.6 }}>Dedicated portals for Admins, Technicians, and Users to manage their specific tasks and queues.</p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
