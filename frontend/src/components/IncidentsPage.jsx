@@ -510,3 +510,258 @@ const IncidentsPage = () => {
 };
 
 export default IncidentsPage;
+}>
+                    <input 
+                      type="text" 
+                      name="preferredTime"
+                      value={formData.preferredTime}
+                      onChange={handleInputChange}
+                      placeholder="Ex: 9.00 AM - 12.00 PM" 
+                      style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Issue Title */}
+              <div className="flex flex-col gap-2">
+                <label style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Issue Title</label>
+                <div style={{ position: 'relative' }}>
+                  <FileText size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                  <input 
+                    type="text" 
+                    name="issueTitle"
+                    value={formData.issueTitle}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Projector display not visible" 
+                    required
+                    style={{ width: '100%', padding: '1rem 1.25rem 1rem 3rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a' }}
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: Cat & Loc */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                <div className="flex flex-col gap-2">
+                  <label style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Category</label>
+                  <div style={{ position: 'relative' }}>
+                    <select 
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a', appearance: 'none' }}
+                    >
+                      <option>Select category</option>
+                      <option>Equipment Fault</option>
+                      <option>Facility Damage</option>
+                      <option>Network Issue</option>
+                      <option>Other</option>
+                    </select>
+                    <ChevronDown size={18} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Location</label>
+                  <div style={{ position: 'relative' }}>
+                    <select 
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a', appearance: 'none' }}
+                    >
+                      <option>Select location</option>
+                      <option>Main Hall</option>
+                      <option>Lab A</option>
+                      <option>Library</option>
+                      <option>Cafeteria</option>
+                    </select>
+                    <ChevronDown size={18} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Priority Selector */}
+              <div className="flex flex-col gap-3">
+                <label style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Priority</label>
+                <div className="flex gap-4">
+                  <button 
+                    type="button" 
+                    onClick={() => setPriority('LOW')}
+                    className="btn-hover"
+                    style={{ 
+                      padding: '0.6rem 1.75rem', 
+                      borderRadius: '12px', 
+                      border: priority === 'LOW' ? '1px solid #93c5fd' : '1px solid rgba(0,0,0,0.05)', 
+                      background: priority === 'LOW' ? '#dbeafe' : '#f8fafc', 
+                      color: priority === 'LOW' ? '#1e40af' : '#64748b', 
+                      fontWeight: '700', 
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    LOW
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setPriority('MEDIUM')}
+                    className="btn-hover"
+                    style={{ 
+                      padding: '0.6rem 1.75rem', 
+                      borderRadius: '12px', 
+                      border: priority === 'MEDIUM' ? '1px solid #fde68a' : '1px solid rgba(0,0,0,0.05)', 
+                      background: priority === 'MEDIUM' ? '#fef3c7' : '#f8fafc', 
+                      color: priority === 'MEDIUM' ? '#92400e' : '#64748b', 
+                      fontWeight: '700', 
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    MEDIUM
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setPriority('HIGH')}
+                    className="btn-hover"
+                    style={{ 
+                      padding: '0.6rem 1.75rem', 
+                      borderRadius: '12px', 
+                      border: priority === 'HIGH' ? '1px solid #fca5a5' : '1px solid rgba(0,0,0,0.05)', 
+                      background: priority === 'HIGH' ? '#fee2e2' : '#f8fafc', 
+                      color: priority === 'HIGH' ? '#b91c1c' : '#64748b', 
+                      fontWeight: '700', 
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    HIGH
+                  </button>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="flex flex-col gap-2">
+                <label style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Description</label>
+                <textarea 
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Clearly describe the issue, when it happened, and any visible damage or symptoms." 
+                  style={{ width: '100%', padding: '1.25rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a', minHeight: '150px', resize: 'vertical' }}
+                />
+              </div>
+
+              {/* File Upload */}
+              <div className="flex flex-col gap-3">
+                <label style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>Upload Images (Max 3)</label>
+                <div 
+                  style={{ 
+                    border: '2px dashed rgba(59, 130, 246, 0.2)', 
+                    borderRadius: '20px', 
+                    padding: '3rem', 
+                    textAlign: 'center',
+                    background: 'rgba(59, 130, 246, 0.02)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <UploadCloud size={40} style={{ color: '#2563eb' }} />
+                  <div>
+                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.25rem' }}>Click to upload images</div>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>PNG, JPG or JPEG files • up to 3 files</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Actions and Info Section */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2.5rem', gap: '3rem' }}>
+                
+                {/* Info Note Box (Left) */}
+                <div 
+                  style={{ 
+                    flex: 1,
+                    padding: '1.25rem 1.75rem',
+                    background: 'rgba(37, 99, 235, 0.04)',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(37, 99, 235, 0.1)',
+                    display: 'flex',
+                    gap: '1.25rem',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div style={{ color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Info size={24} />
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                      <span style={{ fontSize: '1rem', fontWeight: '800', color: '#2563eb' }}>Please Note</span>
+                      <p style={{ fontSize: '0.9rem', color: '#475569', lineHeight: 1.4 }}>
+                          After submission, your ticket will be reviewed by our team. You will receive updates via email or notifications.
+                      </p>
+                  </div>
+                </div>
+
+                {/* Form Buttons (Right) */}
+                <div className="flex items-center gap-3" style={{ flexShrink: 0 }}>
+                  <button 
+                    type="button" 
+                    onClick={handleReset}
+                    className="btn btn-hover" 
+                    style={{ 
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '1rem 1.75rem', 
+                      borderRadius: '12px', 
+                      background: '#ffffff', 
+                      border: '1px solid rgba(0,0,0,0.1)', 
+                      color: '#0f172a',
+                      fontWeight: '700',
+                      fontSize: '0.95rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
+                    <RotateCcw size={18} />
+                    Reset
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-hover" 
+                    style={{ 
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '1rem 2rem', 
+                      borderRadius: '12px', 
+                      background: '#2563eb',
+                      border: 'none',
+                      color: 'white',
+                      fontWeight: '700',
+                      fontSize: '1rem',
+                      boxShadow: '0 8px 20px rgba(37, 99, 235, 0.2)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
+                    <Send size={18} />
+                    Submit Ticket
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </section>
+>>>>>>> main
+    </div>
+  );
+};
+
+export default IncidentsPage;

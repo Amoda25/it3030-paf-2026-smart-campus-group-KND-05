@@ -21,3 +21,4 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
            "] }")
     List<Booking> findOverlappingBookings(String facilityId, LocalDateTime start, LocalDateTime end);
 }
+

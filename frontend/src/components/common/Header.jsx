@@ -26,8 +26,14 @@ const Header = () => {
 
         <nav className="hidden lg-flex items-center gap-8" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <Link to="/" className="nav-link" style={{ fontWeight: '600' }}>Home</Link>
+          <Link to="/courses" className="nav-link" style={{ fontWeight: '600' }}>Courses</Link>
           <Link to="/facilities" className="nav-link" style={{ fontWeight: '600' }}>Facilities</Link>
+          <Link to="/incidents" className="nav-link" style={{ fontWeight: '600' }}>Ticket</Link>
+          <Link to="/book" className="nav-link" style={{ fontWeight: '600' }}>Book Resource</Link>
+          <Link to="/my-bookings" className="nav-link" style={{ fontWeight: '600' }}>My Bookings</Link>
           <Link to="/dashboard" className="nav-link" style={{ fontWeight: '600' }}>Dashboard</Link>
+          <Link to="/about" className="nav-link" style={{ fontWeight: '600' }}>About Us</Link>
+          <Link to="/contact" className="nav-link" style={{ fontWeight: '600' }}>Contact Us</Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -56,15 +62,19 @@ const Header = () => {
         <div className="glass flex flex-col gap-6" style={{ width: '100%', padding: '2rem', borderRadius: '1.5rem' }}>
           <nav className="flex flex-col gap-4">
             <Link to="/" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+            <Link to="/courses" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
             <Link to="/facilities" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Facilities</Link>
+            <Link to="/incidents" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Ticket</Link>
+            <Link to="/book" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Book Resource</Link>
+            <Link to="/my-bookings" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>My Bookings</Link>
             <Link to="/dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-            <a href="#solutions" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Solutions</a>
-            <a href="#about" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>About Us</a>
+            <Link to="/about" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
+            <Link to="/contact" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>
           </nav>
           <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
           <div className="flex flex-col gap-3">
-             <Link to="/login" className="btn btn-outline" style={{ width: '100%' }}>Login</Link>
-             <Link to="/register" className="btn btn-white" style={{ width: '100%' }}>Register</Link>
+             <Link to="/login" className="btn btn-outline" style={{ width: '100%' }} onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+             <Link to="/register" className="btn btn-white" style={{ width: '100%' }} onClick={() => setIsMobileMenuOpen(false)}>Register</Link>
           </div>
         </div>
       </div>

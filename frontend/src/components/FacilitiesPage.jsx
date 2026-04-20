@@ -196,6 +196,7 @@ const FacilitiesPage = () => {
             gap: '8px'
           }}>
             <div style={{ width: '4px', height: '14px', background: 'var(--primary)', borderRadius: '2px' }}></div>
+
             Resource Control
           </div>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

@@ -28,3 +28,4 @@ public class Booking {
     private String purpose;
     private LocalDateTime createdAt = LocalDateTime.now();
 }
+
