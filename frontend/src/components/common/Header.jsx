@@ -27,6 +27,8 @@ const Header = () => {
         <nav className="hidden lg-flex items-center gap-8" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <Link to="/" className="nav-link" style={{ fontWeight: '600' }}>Home</Link>
           <Link to="/courses" className="nav-link" style={{ fontWeight: '600' }}>Courses</Link>
+          <Link to="/facilities" className="nav-link" style={{ fontWeight: '600' }}>Facilities</Link>
+          <Link to="/dashboard" className="nav-link" style={{ fontWeight: '600' }}>Dashboard</Link>
           <Link to="/about" className="nav-link" style={{ fontWeight: '600' }}>About Us</Link>
           <Link to="/contact" className="nav-link" style={{ fontWeight: '600' }}>Contact Us</Link>
         </nav>
@@ -58,6 +60,8 @@ const Header = () => {
           <nav className="flex flex-col gap-4">
             <Link to="/" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
             <Link to="/courses" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
+            <Link to="/facilities" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Facilities</Link>
+            <Link to="/dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
             <Link to="/about" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
             <Link to="/contact" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>
           </nav>
