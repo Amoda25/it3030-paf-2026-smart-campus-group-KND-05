@@ -29,7 +29,10 @@ import {
   ClipboardList,
   Building2,
   ShieldCheck,
-  Zap
+  Zap,
+  Dumbbell,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -52,6 +55,25 @@ const FacilitiesPage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name || formData.name.length < 3) {
+      newErrors.name = 'Facility name must be at least 3 characters long.';
+    }
+    if (!formData.capacity || formData.capacity <= 0) {
+      newErrors.capacity = 'Capacity must be a positive number.';
+    }
+    if (!formData.location) {
+      newErrors.location = 'Location is required.';
+    }
+    if (!formData.description) {
+      newErrors.description = 'Please provide a short description.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   useEffect(() => {
     fetchFacilities();
@@ -72,6 +94,8 @@ const FacilitiesPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     setSubmitting(true);
     try {
       const response = await fetch('http://localhost:8080/api/facilities', {
@@ -82,6 +106,7 @@ const FacilitiesPage = () => {
       if (response.ok) {
         setSuccessMsg('Facility registered successfully!');
         setFormData({ name: '', type: 'Lecture Hall', capacity: '', location: '', status: 'ACTIVE', description: '', imageUrl: '' });
+        setErrors({});
         fetchFacilities();
         setTimeout(() => {
           setSuccessMsg('');
@@ -95,7 +120,7 @@ const FacilitiesPage = () => {
     }
   };
 
-  const categories = ['All', 'Lecture Hall', 'Lab', 'Meeting Room', 'Studios', 'Equipment'];
+  const categories = ['All', 'Lecture Hall', 'Lab', 'Gym', 'Meeting Room', 'Studios', 'Equipment'];
 
   const filteredFacilities = facilities.filter(fac => {
     const matchesSearch = fac.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -108,9 +133,22 @@ const FacilitiesPage = () => {
     switch (type) {
       case 'Lecture Hall': return <BookOpen size={18} />;
       case 'Lab': return <Monitor size={18} />;
+      case 'Gym': return <Dumbbell size={18} />;
       case 'Meeting Room': return <Users size={18} />;
       case 'Equipment': return <Mic2 size={18} />;
+      case 'Studios': return <Camera size={18} />;
       default: return <Box size={18} />;
+    }
+  };
+
+  const getDefaultImage = (type) => {
+    switch (type) {
+      case 'Gym': return "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop";
+      case 'Lecture Hall': return "https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2070&auto=format&fit=crop";
+      case 'Lab': return "https://images.unsplash.com/photo-1581091226875-a30884e7e17c?q=80&w=2070&auto=format&fit=crop";
+      case 'Meeting Room': return "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2070&auto=format&fit=crop";
+      case 'Studios': return "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop";
+      default: return "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2070&auto=format&fit=crop";
     }
   };
 
@@ -257,22 +295,35 @@ const FacilitiesPage = () => {
               {/* Stats Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
                 {[
-                  { label: 'Total Facilities', value: facilities.length, icon: <Building2 className="text-primary" />, trend: '+2 this month' },
-                  { label: 'Active Assets', value: facilities.filter(f => f.status === 'ACTIVE').length, icon: <Zap style={{ color: '#10b981' }} />, trend: '100% Uptime' },
-                  { label: 'Maintenance', value: facilities.filter(f => f.status !== 'ACTIVE').length, icon: <Settings style={{ color: '#f59e0b' }} />, trend: '2 Pending' },
-                  { label: 'Utilization', value: '84%', icon: <PieChart style={{ color: '#8b5cf6' }} />, trend: 'High demand' },
+                  { label: 'Total Facilities', value: facilities.length, icon: <Building2 size={24} style={{ color: '#3b82f6' }} />, trend: '+2 this month', gradient: 'linear-gradient(135deg, #fff 0%, #eff6ff 100%)' },
+                  { label: 'Active Assets', value: facilities.filter(f => f.status === 'ACTIVE').length, icon: <Zap size={24} style={{ color: '#10b981' }} />, trend: '100% Uptime', gradient: 'linear-gradient(135deg, #fff 0%, #ecfdf5 100%)' },
+                  { label: 'Maintenance', value: facilities.filter(f => f.status !== 'ACTIVE').length, icon: <Settings size={24} style={{ color: '#f59e0b' }} />, trend: '2 Pending', gradient: 'linear-gradient(135deg, #fff 0%, #fffbeb 100%)' },
+                  { label: 'System Health', value: '98.2%', icon: <Activity size={24} style={{ color: '#8b5cf6' }} />, trend: 'Optimal', gradient: 'linear-gradient(135deg, #fff 0%, #f5f3ff 100%)' },
                 ].map((stat, i) => (
-                  <div key={i} className="glass" style={{ padding: '2rem', borderRadius: '1.5rem', background: '#fff' }}>
-                    <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'start', marginBottom: '1.5rem' }}>
-                       <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(0,0,0,0.02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div key={i} className="glass card-hover" style={{ 
+                    padding: '2rem', 
+                    borderRadius: '2rem', 
+                    background: stat.gradient, 
+                    border: '1px solid rgba(0,0,0,0.03)',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.02)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
+                       <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                          {stat.icon}
                        </div>
-                       <ArrowUpRight size={18} style={{ color: 'var(--text-muted)', opacity: 0.5 }} />
+                       <div style={{ padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.8)', fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)' }}>
+                         REAL-TIME
+                       </div>
                     </div>
-                    <div style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.25rem' }}>{stat.value}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
-                    <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: stat.trend.includes('+') || stat.trend.includes('100%') ? '#10b981' : 'var(--text-muted)', fontWeight: '700' }}>
-                      {stat.trend}
+                    <div style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.25rem', color: '#0f172a', letterSpacing: '-1px' }}>{stat.value}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
+                    <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(0,0,0,0.05)' }}>
+                        <div style={{ width: '70%', height: '100%', borderRadius: '2px', background: stat.trend.includes('+') || stat.trend.includes('100%') || stat.trend === 'Optimal' ? '#10b981' : '#f59e0b' }}></div>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: stat.trend.includes('+') || stat.trend.includes('100%') || stat.trend === 'Optimal' ? '#059669' : '#b45309', fontWeight: '800' }}>
+                        {stat.trend}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -350,31 +401,56 @@ const FacilitiesPage = () => {
               ) : filteredFacilities.length > 0 ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                   {filteredFacilities.map(fac => (
-                    <div key={fac.id} className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.03)', background: '#fff' }}>
-                      <div style={{ position: 'relative', height: '180px' }}>
+                    <div key={fac.id} className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.03)', background: '#fff', position: 'relative' }}>
+                      <div style={{ position: 'relative', height: '200px' }}>
                         <img 
-                          src={fac.imageUrl || "https://images.unsplash.com/photo-1497366216548-37526070297c"} 
+                          src={fac.imageUrl || getDefaultImage(fac.type)} 
                           alt={fac.name} 
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
-                        <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 255, 255, 0.9)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 255, 255, 0.95)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
                            {getIcon(fac.type)} {fac.type}
+                        </div>
+                        <div style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}>
+                           <button className="glass" style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0f172a', border: 'none' }}>
+                             <MoreVertical size={18} />
+                           </button>
                         </div>
                       </div>
                       
                       <div style={{ padding: '1.5rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '0.25rem', color: '#0f172a' }}>{fac.name}</h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', marginBottom: '1.25rem', fontSize: '0.8rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                          <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a' }}>{fac.name}</h3>
+                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: fac.status === 'ACTIVE' ? '#10b981' : '#f59e0b', marginTop: '6px' }}></div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
                           <MapPin size={14} /> {fac.location}
                         </div>
                         
                         <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
-                          <div className="flex items-center gap-2">
-                            <Users size={16} className="text-primary" />
-                            <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{fac.capacity}</span>
-                            <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Capacity</span>
+                          <div className="flex items-center gap-3">
+                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <Users size={16} className="text-primary" />
+                            </div>
+                            <div>
+                               <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#0f172a' }}>{fac.capacity}</div>
+                               <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Capacity</div>
+                            </div>
                           </div>
-                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: fac.status === 'ACTIVE' ? '#10b981' : '#f59e0b' }}></div>
+                          
+                          <button style={{ 
+                            padding: '6px 12px', 
+                            borderRadius: '8px', 
+                            background: '#f8fafc', 
+                            border: '1px solid #e2e8f0', 
+                            fontSize: '0.75rem', 
+                            fontWeight: '700', 
+                            color: 'var(--text-muted)',
+                            cursor: 'pointer'
+                          }}>
+                            Details
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -391,121 +467,330 @@ const FacilitiesPage = () => {
           )}
 
           {activeView === 'add' && (
-            <div style={{ maxWidth: '900px' }}>
-              <form onSubmit={handleSubmit} className="glass p-10" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>FACILITY NAME</label>
-                        <input 
-                            required
-                            type="text" 
-                            placeholder="e.g. Innovation Hall A"
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        />
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>RESOURCE TYPE</label>
-                        <select 
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.type}
-                            onChange={(e) => setFormData({...formData, type: e.target.value})}
-                        >
-                            <option>Lecture Hall</option>
-                            <option>Lab</option>
-                            <option>Meeting Room</option>
-                            <option>Studios</option>
-                            <option>Equipment</option>
-                        </select>
-                    </div>
+            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '3rem' }}>
+              <div className="glass" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', padding: '2.5rem' }}>
+                <div style={{ marginBottom: '2rem' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>Resource Registration</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Fill in the specifications to deploy a new campus asset.</p>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>CAPACITY (PEOPLE/UNITS)</label>
-                        <input 
-                            required
-                            type="number" 
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.capacity}
-                            onChange={(e) => setFormData({...formData, capacity: e.target.value})}
-                        />
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div className="flex flex-col gap-2">
+                       <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>FACILITY NAME</label>
+                       <div style={{ position: 'relative' }}>
+                          <Info size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
+                          <input 
+                              type="text" 
+                              placeholder="e.g. Spartan Gym Cluster"
+                              style={{ 
+                                width: '100%',
+                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
+                                borderRadius: '12px', 
+                                border: errors.name ? '2px solid #ef4444' : '1px solid #e2e8f0', 
+                                background: '#f8fafc', 
+                                outline: 'none', 
+                                fontSize: '0.9rem',
+                                transition: 'all 0.2s ease'
+                              }}
+                              value={formData.name}
+                              onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          />
+                       </div>
+                       {errors.name && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.name}</span>}
                     </div>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>CAMPUS LOCATION</label>
-                        <input 
-                            required
-                            type="text" 
-                            placeholder="e.g. West Wing, Floor 2"
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.location}
-                            onChange={(e) => setFormData({...formData, location: e.target.value})}
-                        />
-                    </div>
-                </div>
 
-                <div className="flex flex-col gap-3 mb-8">
-                    <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>RESOURCE DESCRIPTION</label>
+                    <div className="flex flex-col gap-2">
+                        <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>RESOURCE TYPE</label>
+                        <div style={{ position: 'relative' }}>
+                          <Box size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
+                          <select 
+                              style={{ 
+                                width: '100%',
+                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
+                                borderRadius: '12px', 
+                                border: '1px solid #e2e8f0', 
+                                background: '#f8fafc', 
+                                outline: 'none', 
+                                fontSize: '0.9rem',
+                                cursor: 'pointer'
+                              }}
+                              value={formData.type}
+                              onChange={(e) => setFormData({...formData, type: e.target.value})}
+                          >
+                              <option>Lecture Hall</option>
+                              <option>Lab</option>
+                              <option>Gym</option>
+                              <option>Meeting Room</option>
+                              <option>Studios</option>
+                              <option>Equipment</option>
+                          </select>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div className="flex flex-col gap-2">
+                        <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>MAX CAPACITY</label>
+                        <div style={{ position: 'relative' }}>
+                          <Users size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
+                          <input 
+                              type="number" 
+                              placeholder="0"
+                              style={{ 
+                                width: '100%',
+                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
+                                borderRadius: '12px', 
+                                border: errors.capacity ? '2px solid #ef4444' : '1px solid #e2e8f0', 
+                                background: '#f8fafc', 
+                                outline: 'none', 
+                                fontSize: '0.9rem'
+                              }}
+                              value={formData.capacity}
+                              onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+                          />
+                        </div>
+                        {errors.capacity && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.capacity}</span>}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>CAMPUS LOCATION</label>
+                        <div style={{ position: 'relative' }}>
+                          <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
+                          <input 
+                              type="text" 
+                              placeholder="e.g. Sports Complex, Level 2"
+                              style={{ 
+                                width: '100%',
+                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
+                                borderRadius: '12px', 
+                                border: errors.location ? '2px solid #ef4444' : '1px solid #e2e8f0', 
+                                background: '#f8fafc', 
+                                outline: 'none', 
+                                fontSize: '0.9rem'
+                              }}
+                              value={formData.location}
+                              onChange={(e) => setFormData({...formData, location: e.target.value})}
+                          />
+                        </div>
+                        {errors.location && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.location}</span>}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>IMAGE RESOURCE LINK (OPTIONAL)</label>
+                    <div style={{ position: 'relative' }}>
+                      <Globe size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
+                      <input 
+                          type="text" 
+                          placeholder="https://images.unsplash.com/photo-..."
+                          style={{ 
+                            width: '100%',
+                            padding: '0.85rem 1rem 0.85rem 2.5rem', 
+                            borderRadius: '12px', 
+                            border: '1px solid #e2e8f0', 
+                            background: '#f8fafc', 
+                            outline: 'none', 
+                            fontSize: '0.9rem'
+                          }}
+                          value={formData.imageUrl}
+                          onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>TECHNICAL DESCRIPTION</label>
                     <textarea 
-                        style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', minHeight: '100px', resize: 'none', fontSize: '0.9rem' }}
+                        style={{ 
+                          padding: '1rem', 
+                          borderRadius: '12px', 
+                          border: errors.description ? '2px solid #ef4444' : '1px solid #e2e8f0', 
+                          background: '#f8fafc', 
+                          outline: 'none', 
+                          minHeight: '120px', 
+                          resize: 'none', 
+                          fontSize: '0.9rem' 
+                        }}
                         value={formData.description}
-                        placeholder="Detail the technical specs or room features..."
+                        placeholder="Detail the technical specs, amenities, or special equipment available..."
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
                     />
-                </div>
+                    {errors.description && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.description}</span>}
+                  </div>
 
-                <button type="submit" disabled={submitting} className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
-                    {submitting ? 'Registering node...' : 'Register Facility'}
-                </button>
+                  <button 
+                    type="submit" 
+                    disabled={submitting} 
+                    className="btn btn-primary" 
+                    style={{ 
+                      width: '100%', 
+                      padding: '1.25rem', 
+                      borderRadius: '16px', 
+                      fontSize: '1rem', 
+                      fontWeight: '800',
+                      marginTop: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.75rem'
+                    }}
+                  >
+                    {submitting ? (
+                      <>
+                        <div className="animate-spin" style={{ width: '20px', height: '20px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%' }}></div>
+                        Deploying Asset...
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={20} /> Deploy Facility
+                      </>
+                    )}
+                  </button>
 
-                {successMsg && (
-                    <div className="animate-fade-in mt-6" style={{ padding: '1rem', background: '#dcfce7', color: '#15803d', borderRadius: '10px', textAlign: 'center', fontWeight: '700', fontSize: '0.9rem' }}>
-                        {successMsg}
+                  {successMsg && (
+                      <div className="animate-fade-in mt-6" style={{ padding: '1rem', background: '#ecfdf5', color: '#059669', borderRadius: '12px', textAlign: 'center', fontWeight: '700', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', border: '1px solid #10b981' }}>
+                          <CheckCircle2 size={18} /> {successMsg}
+                      </div>
+                  )}
+                </form>
+              </div>
+
+              {/* Live Preview Side */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                 <div style={{ padding: '1rem 0' }}>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: '900', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>VIRTUAL TWIN PREVIEW</h4>
+                    <div className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.03)', background: '#fff', opacity: formData.name ? 1 : 0.5, transition: 'opacity 0.3s ease' }}>
+                        <div style={{ position: 'relative', height: '200px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+                            <img 
+                              src={formData.imageUrl || getDefaultImage(formData.type)} 
+                              alt="Background" 
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7)' }}
+                            />
+                          </div>
+                          <div style={{ position: 'relative', zIndex: 1, color: '#fff', textAlign: 'center' }}>
+                             {getIcon(formData.type)}
+                             <div style={{ fontSize: '0.75rem', fontWeight: '700', marginTop: '0.5rem', opacity: 0.8 }}>SYSTEM RENDERING</div>
+                          </div>
+                          <div style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', background: 'var(--primary)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                             {formData.type}
+                          </div>
+                        </div>
+                        
+                        <div style={{ padding: '1.5rem' }}>
+                          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '0.5rem', color: '#0f172a' }}>{formData.name || "Untitled Facility"}</h3>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.85rem' }}>
+                            <MapPin size={16} /> {formData.location || "Assign a location"}
+                          </div>
+                          
+                          <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
+                            <div className="flex items-center gap-3">
+                              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Users size={16} className="text-primary" />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: '800', fontSize: '0.95rem', color: '#1e293b' }}>{formData.capacity || "0"}</div>
+                                <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '700', textTransform: 'uppercase' }}>Allowed Node Usage</div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 12px rgba(16, 185, 129, 0.5)' }}></div>
+                               <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#10b981' }}>SYSTEM ONLINE</span>
+                            </div>
+                          </div>
+                        </div>
                     </div>
-                )}
-              </form>
+                 </div>
+
+                 <div className="glass" style={{ padding: '1.5rem', borderRadius: '1.5rem', background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', color: '#fff', border: 'none' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                       <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <AlertCircle size={20} className="text-primary" />
+                       </div>
+                       <div style={{ fontWeight: '700', fontSize: '1rem' }}>Registration Protocol</div>
+                    </div>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.7, lineHeight: 1.6 }}>
+                       All new facilities must undergo a safety certification before operational activation. Deploying a node here will trigger a maintenance review cycle.
+                    </p>
+                 </div>
+              </div>
             </div>
           )}
 
           {activeView === 'maintenance' && (
-            <div className="glass" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-              <div style={{ padding: '2rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Scheduled Maintenance</h3>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                   <div style={{ padding: '4px 12px', borderRadius: '20px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 'bold' }}>3 ACTIVE</div>
-                   <div style={{ padding: '4px 12px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#92400e', fontSize: '0.75rem', fontWeight: 'bold' }}>1 PENDING</div>
+            <div className="glass animate-fade-in" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+              <div style={{ padding: '2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(to right, #fff, #f8fafc)' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>Maintenance Protocol Log</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Real-time monitoring of campus asset health and service cycles.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                   <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.1)', color: '#059669', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                     <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></div> 3 ACTIVE
+                   </div>
+                   <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(245, 158, 11, 0.1)', color: '#b45309', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                     <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div> 1 PENDING
+                   </div>
                 </div>
               </div>
               
-              <div style={{ padding: '2rem' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ padding: '1.5rem 2.5rem 2.5rem 2.5rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0.75rem' }}>
                   <thead>
-                    <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9' }}>
-                      <th style={{ padding: '1rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Asset</th>
-                      <th style={{ padding: '1rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Issue Type</th>
-                      <th style={{ padding: '1rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Last Serviced</th>
-                      <th style={{ padding: '1rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</th>
-                      <th style={{ padding: '1rem 0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Action</th>
+                    <tr style={{ textAlign: 'left' }}>
+                      <th style={{ padding: '1rem', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Asset Node</th>
+                      <th style={{ padding: '1rem', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Service Type</th>
+                      <th style={{ padding: '1rem', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Cycle Date</th>
+                      <th style={{ padding: '1rem', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Operations Status</th>
+                      <th style={{ padding: '1rem', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Trace</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { asset: 'Innovation Lab A', issue: 'Network Reset', date: '2026-04-10', status: 'In Progress' },
-                      { asset: 'Lecture Theatre 02', issue: 'Projector Service', date: '2026-03-25', status: 'Pending' },
-                      { asset: 'Level 4 Server Room', issue: 'AC Maintenance', date: '2026-04-18', status: 'In Progress' },
+                      { asset: 'Innovation Lab A', type: 'Lab', issue: 'Network Optimization', date: '2026-04-20', status: 'In Progress', priority: 'High' },
+                      { asset: 'Spartan Gym Cluster', type: 'Gym', issue: 'Equipment Calibration', date: '2026-04-19', status: 'Pending', priority: 'Medium' },
+                      { asset: 'Lecture Theatre 02', type: 'Lecture Hall', issue: 'Optics Service', date: '2026-04-15', status: 'Completed', priority: 'Low' },
+                      { asset: 'Level 4 Server Room', type: 'Equipment', issue: 'Thermal Review', date: '2026-04-18', status: 'In Progress', priority: 'Critical' },
                     ].map((log, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                         <td style={{ padding: '1.25rem 0.5rem', fontSize: '0.9rem', fontWeight: '700' }}>{log.asset}</td>
-                         <td style={{ padding: '1.25rem 0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>{log.issue}</td>
-                         <td style={{ padding: '1.25rem 0.5rem', fontSize: '0.85rem' }}>{log.date}</td>
-                         <td style={{ padding: '1.25rem 0.5rem' }}>
-                           <span style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 'bold', background: log.status === 'Pending' ? '#fef3c7' : '#dbeafe', color: log.status === 'Pending' ? '#92400e' : '#1e40af' }}>
-                             {log.status}
+                      <tr key={i} className="card-hover" style={{ background: '#f8fafc', borderRadius: '12px' }}>
+                         <td style={{ padding: '1.25rem 1rem', borderRadius: '12px 0 0 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                               <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                 {getIcon(log.type)}
+                               </div>
+                               <div>
+                                 <div style={{ fontWeight: '800', fontSize: '0.95rem', color: '#1e293b' }}>{log.asset}</div>
+                                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>ID: RES-882{i}</div>
+                               </div>
+                            </div>
+                         </td>
+                         <td style={{ padding: '1.25rem 1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                               <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#334155' }}>{log.issue}</span>
+                               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>System Routine</span>
+                            </div>
+                         </td>
+                         <td style={{ padding: '1.25rem 1rem', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>{log.date}</td>
+                         <td style={{ padding: '1.25rem 1rem' }}>
+                           <span style={{ 
+                             padding: '6px 12px', 
+                             borderRadius: '8px', 
+                             fontSize: '0.7rem', 
+                             fontWeight: '800', 
+                             background: log.status === 'Pending' ? '#fffbeb' : log.status === 'In Progress' ? '#eff6ff' : '#ecfdf5', 
+                             color: log.status === 'Pending' ? '#92400e' : log.status === 'In Progress' ? '#1e40af' : '#047857',
+                             display: 'inline-flex',
+                             alignItems: 'center',
+                             gap: '6px'
+                           }}>
+                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></div>
+                             {log.status.toUpperCase()}
                            </span>
                          </td>
-                         <td style={{ padding: '1.25rem 0.5rem' }}>
-                           <button style={{ color: 'var(--primary)', background: 'none', border: 'none', fontWeight: '800', fontSize: '0.8rem', cursor: 'pointer' }}>Details</button>
+                         <td style={{ padding: '1.25rem 1rem', borderRadius: '0 12px 12px 0' }}>
+                           <button style={{ color: 'var(--primary)', background: '#fff', border: '1px solid #e2e8f0', fontWeight: '800', fontSize: '0.75rem', cursor: 'pointer', padding: '8px 16px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                             DETAILS
+                           </button>
                          </td>
                       </tr>
                     ))}
