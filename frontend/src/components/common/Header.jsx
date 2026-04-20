@@ -25,6 +25,8 @@ const Header = () => {
 
         <nav className="hidden lg-flex items-center gap-8" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <a href="/" className="nav-link" style={{ fontWeight: '600' }}>Home</a>
+          <a href="/book" className="nav-link" style={{ fontWeight: '600' }}>Book Resource</a>
+          <a href="/my-bookings" className="nav-link" style={{ fontWeight: '600' }}>My Bookings</a>
           <a href="#features" className="nav-link" style={{ fontWeight: '600' }}>Features</a>
         </nav>
 
@@ -53,9 +55,10 @@ const Header = () => {
       <div className={`lg-hidden fixed ${isMobileMenuOpen ? 'flex' : 'hidden'}`} style={{ top: '80px', left: 0, right: 0, padding: '1rem', background: 'rgba(2, 6, 23, 0.95)', backdropFilter: 'blur(20px)', zIndex: 999 }}>
         <div className="glass flex flex-col gap-6" style={{ width: '100%', padding: '2rem', borderRadius: '1.5rem' }}>
           <nav className="flex flex-col gap-4">
+            <a href="/" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Home</a>
+            <a href="/book" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Book Resource</a>
+            <a href="/my-bookings" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>My Bookings</a>
             <a href="#features" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Features</a>
-            <a href="#solutions" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Solutions</a>
-            <a href="#about" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>About Us</a>
           </nav>
           <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
           <div className="flex flex-col gap-3">
