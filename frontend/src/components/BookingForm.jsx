@@ -87,7 +87,8 @@ const BookingForm = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/bookings', {
+      // Backend port is 8081
+      const response = await fetch('http://localhost:8081/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -148,12 +149,12 @@ const BookingForm = () => {
         )}
 
         <div className="glass p-8 lg-p-12" style={{ borderRadius: '2rem' }}>
-          {/* Form Content */}
           <form onSubmit={handleSubmit}>
              {step === 1 && (
                <div className="flex flex-col gap-6">
                  <input className="px-4 py-3" name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleInputChange} style={{ borderRadius: '12px', border: '1px solid var(--border-light)' }} />
                  <input className="px-4 py-3" name="sid" placeholder="ID Number" value={formData.sid} onChange={handleInputChange} style={{ borderRadius: '12px', border: '1px solid var(--border-light)' }} />
+                 {error && <p style={{ color: '#ef4444', fontSize: '0.9rem' }}>{error}</p>}
                </div>
              )}
              
@@ -161,7 +162,10 @@ const BookingForm = () => {
                <div className="grid grid-cols-2 gap-4">
                  {resourceTypes.map(type => (
                    <div key={type.id} onClick={() => setFormData(p => ({...p, resourceType: type.id, resourceName: resources[type.id][0]}))} className={`p-6 cursor-pointer border-2 transition-all ${formData.resourceType === type.id ? 'border-primary' : 'border-transparent'}`} style={{ borderRadius: '16px', background: '#f8fafc' }}>
-                     {type.name}
+                     <div className="flex flex-col items-center gap-2">
+                       {type.icon}
+                       <span>{type.name}</span>
+                     </div>
                    </div>
                  ))}
                </div>
@@ -181,9 +185,9 @@ const BookingForm = () => {
              <div className="flex justify-between mt-12">
                {step > 1 && <button type="button" className="btn btn-outline" onClick={prevStep}>Back</button>}
                {step < 3 ? (
-                 <button type="button" className="btn btn-primary" onClick={nextStep}>Next</button>
+                 <button type="button" className="btn btn-primary" onClick={nextStep} style={{ marginLeft: 'auto' }}>Next</button>
                ) : (
-                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>{isSubmitting ? '...' : 'Confirm'}</button>
+                 <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ marginLeft: 'auto' }}>{isSubmitting ? '...' : 'Confirm'}</button>
                )}
              </div>
           </form>

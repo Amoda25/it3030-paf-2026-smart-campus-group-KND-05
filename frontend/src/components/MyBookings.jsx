@@ -28,7 +28,8 @@ const MyBookings = () => {
     setError('');
     
     try {
-      const response = await fetch(`http://localhost:8080/api/bookings/user/${sid}`);
+      // Team's backend port is 8081
+      const response = await fetch(`http://localhost:8081/api/bookings/user/${sid}`);
       if (response.ok) {
         const data = await response.json();
         setBookings(data);
