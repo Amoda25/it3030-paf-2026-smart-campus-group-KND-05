@@ -6,77 +6,77 @@ import {
   Mail, 
   ArrowRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="main-footer" style={{ position: 'relative', padding: '100px 0 40px', overflow: 'hidden', background: '#0f172a' }}>
+    <footer className="main-footer" style={{ position: 'relative', padding: '60px 0 30px', overflow: 'hidden', background: '#0f172a' }}>
       
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '4rem' }}>
+        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2.5rem' }}>
           <div className="footer-about">
-            <a href="/" className="flex items-center gap-3" style={{ textDecoration: 'none', marginBottom: '2rem' }}>
-              <div style={{ width: '40px', height: '40px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Building2 className="text-white" size={24} />
+            <Link to="/" className="flex items-center gap-3" style={{ textDecoration: 'none', marginBottom: '1rem' }}>
+              <div style={{ width: '36px', height: '36px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Building2 className="text-white" size={20} />
               </div>
-              <span style={{ fontSize: '1.75rem', fontWeight: '800', color: 'white' }}>UniHub</span>
-            </a>
-            <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '1.1rem', maxWidth: '320px', lineHeight: 1.6 }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'white' }}>UniHub</span>
+            </Link>
+            <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.95rem', maxWidth: '320px', lineHeight: 1.5 }}>
               Pioneering the next generation of campus infrastructure management. 
-              Our mission is to empower universities with intelligent, data-driven 
-              operational tools.
+              Our mission is to empower universities with intelligent tools.
             </p>
-            <div className="flex gap-4" style={{ marginTop: '2rem' }}>
-              <a href="#" style={{ padding: '0.6rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
-                <X size={20} />
+            <div className="flex gap-3" style={{ marginTop: '1.5rem' }}>
+              <a href="#" style={{ padding: '0.5rem', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
+                <X size={18} />
               </a>
-              <a href="#" style={{ padding: '0.6rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
-                <Globe size={20} />
+              <a href="#" style={{ padding: '0.5rem', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
+                <Globe size={18} />
               </a>
-              <a href="#" style={{ padding: '0.6rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
-                <Mail size={20} />
+              <a href="#" style={{ padding: '0.5rem', borderRadius: '10px', background: 'rgba(255, 255, 255, 0.1)', color: 'white' }}>
+                <Mail size={18} />
               </a>
             </div>
           </div>
 
           <div className="footer-column">
-            <h4 style={{ color: 'white', marginBottom: '2rem', fontSize: '1.25rem' }}>Platform</h4>
-            <ul className="footer-links flex flex-col gap-3" style={{ listStyle: 'none', padding: 0 }}>
-              <li><a href="#features" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontWeight: 500 }}>Features</a></li>
-              <li><a href="#solutions" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontWeight: 500 }}>Solutions</a></li>
-              <li><a href="#integrations" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontWeight: 500 }}>Integrations</a></li>
+            <h4 style={{ color: 'white', marginBottom: '1.2rem', fontSize: '1.1rem' }}>Platform</h4>
+            <ul className="footer-links flex flex-col gap-2" style={{ listStyle: 'none', padding: 0 }}>
+              <li><Link to="/courses" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>Courses</Link></li>
+              <li><Link to="/" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>Features</Link></li>
+              <li><Link to="/" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>Integrations</Link></li>
             </ul>
           </div>
 
           <div className="footer-column">
-            <h4 style={{ color: 'white', marginBottom: '2rem', fontSize: '1.25rem' }}>Company</h4>
-            <ul className="footer-links flex flex-col gap-3" style={{ listStyle: 'none', padding: 0 }}>
-              <li><a href="#about" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontWeight: 500 }}>About Us</a></li>
-              <li><a href="#careers" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontWeight: 500 }}>Careers</a></li>
-              <li><a href="#blog" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontWeight: 500 }}>Latest News</a></li>
+            <h4 style={{ color: 'white', marginBottom: '1.2rem', fontSize: '1.1rem' }}>Company</h4>
+            <ul className="footer-links flex flex-col gap-2" style={{ listStyle: 'none', padding: 0 }}>
+              <li><Link to="/about" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>About Us</Link></li>
+              <li><Link to="/contact" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>Contact Us</Link></li>
+              <li><Link to="/" style={{ color: 'rgba(255, 255, 255, 0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>Careers</Link></li>
             </ul>
           </div>
 
           <div className="footer-newsletter">
-            <h4 style={{ color: 'white', marginBottom: '1rem', fontSize: '1.25rem' }}>Stay Updated</h4>
-            <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Join our newsletter for latest updates on campus tech.</p>
+            <h4 style={{ color: 'white', marginBottom: '0.75rem', fontSize: '1.1rem' }}>Stay Updated</h4>
+            <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.85rem', marginBottom: '1rem' }}>Subscribe for campus tech updates.</p>
             <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
               <input 
                 type="email" 
                 placeholder="Email address" 
-                style={{ flex: 1, background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px', padding: '0.75rem 1rem', color: 'white', outline: 'none' }}
+                style={{ flex: 1, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', padding: '0.6rem 0.8rem', color: 'white', fontSize: '0.85rem', outline: 'none' }}
               />
-              <button className="btn btn-primary" style={{ padding: '0.75rem', border: 'none', background: 'var(--primary)', color: 'white', borderRadius: '12px' }}>
-                <ArrowRight size={20} />
+              <button className="btn btn-primary" style={{ padding: '0.6rem', border: 'none', background: 'var(--primary)', color: 'white', borderRadius: '10px' }}>
+                <ArrowRight size={18} />
               </button>
             </form>
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.15)', color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.8rem', fontWeight: '600' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.75rem' }}>
           <p>© 2026 UniHub. All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="#" style={{ color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none' }}>Privacy</a>
-            <a href="#" style={{ color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none' }}>Terms</a>
+          <div className="flex gap-4">
+            <Link to="/" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none' }}>Privacy</Link>
+            <Link to="/" style={{ color: 'rgba(255, 255, 255, 0.5)', textDecoration: 'none' }}>Terms</Link>
           </div>
         </div>
       </div>
