@@ -144,7 +144,20 @@ const FacilitiesPage = () => {
         zIndex: 10
       }}>
         <div style={{ marginBottom: '2.5rem' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem', paddingLeft: '0.75rem' }}>
+          <div style={{ 
+            fontSize: '0.75rem', 
+            fontWeight: '800', 
+            color: 'var(--primary)', 
+            opacity: 0.6,
+            textTransform: 'uppercase', 
+            letterSpacing: '0.15em', 
+            marginBottom: '1.25rem', 
+            paddingLeft: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <div style={{ width: '12px', height: '2px', background: 'var(--primary)', borderRadius: '2px' }}></div>
             Resource Control
           </div>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
