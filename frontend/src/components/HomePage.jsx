@@ -1,5 +1,4 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Building2, 
   CalendarCheck2, 
@@ -19,6 +18,11 @@ import {
 import campusHero from '../assets/campus_hero.png';
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
+  const handleBookResource = (type, name) => {
+    navigate('/book', { state: { resourceType: type, resourceName: name } });
+  };
   return (
     <div className="home-page" style={{ background: 'var(--bg-deep)' }}>
       {/* Heavy Hero Section with Overlap Support */}
@@ -62,7 +66,14 @@ const HomePage = () => {
                 <div style={{ position: 'absolute', top: -4, right: -4, width: '28px', height: '28px', background: '#0f172a', borderRadius: '50%', fontSize: '0.7rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>01</div>
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e3a8a', marginBottom: '0.5rem' }}>Resource Request</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>User requests a booking or reports a campus incident with key details.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>User requests a booking or reports a campus incident with key details.</p>
+              <button 
+                className="btn btn-outline" 
+                style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
+                onClick={() => handleBookResource('lecture-hall', 'Main Hall')}
+              >
+                Book Sample Hall
+              </button>
             </div>
             <div style={{ textAlign: 'center', padding: '2rem' }}>
               <div style={{ width: '80px', height: '80px', background: 'var(--primary)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto', position: 'relative' }}>
