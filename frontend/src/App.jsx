@@ -4,7 +4,6 @@ import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import HomePage from './components/HomePage';
 import CoursePage from './components/CoursePage';
-import TicketPage from './components/TicketPage';
 import AboutUs from './components/AboutUs';
 import ContactUs from './components/ContactUs';
 import RegisterPage from './components/RegisterPage';
@@ -23,7 +22,6 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/courses" element={<CoursePage />} />
-            <Route path="/tickets" element={<TicketPage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/register" element={<RegisterPage />} />
