@@ -39,7 +39,7 @@ const Dashboard = () => {
       title: "Incident Management",
       description: "Real-time ticket tracking, technician updates, and asset maintenance history.",
       icon: <Wrench size={24} style={{ color: '#f59e0b' }} />,
-      link: "/incidents",
+      link: "/incident-management",
       color: "rgba(245, 158, 11, 0.15)",
       accent: "#f59e0b",
       tag: "Module C"
