@@ -126,7 +126,7 @@ const HomePage = () => {
         <div 
           style={{ 
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'linear-gradient(to bottom, rgba(7, 19, 63, 0.85) 0%, rgba(7, 19, 63, 0.65) 100%)', 
+            background: 'linear-gradient(to bottom, rgba(7, 19, 63, 0.75) 0%, rgba(7, 19, 63, 0.50) 100%)', 
             zIndex: 2 
           }}
         ></div>

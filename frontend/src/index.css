@@ -78,6 +78,11 @@
   scroll-behavior: smooth;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 body {
   min-height: 100vh;
   overflow-x: hidden;
@@ -158,7 +163,7 @@ h1, h2, h3, h4 {
 
 /* Typography Enhancements */
 .gradient-text {
-  background: linear-gradient(135deg, var(--secondary) 0%, #fb923c 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
