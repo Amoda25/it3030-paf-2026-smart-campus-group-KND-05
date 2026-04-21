@@ -164,6 +164,24 @@ const IncidentManagement = () => {
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: '2.5rem', minWidth: 0 }}>
+        {/* Dynamic Page Title */}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h1 style={{ 
+            fontSize: '2.25rem', 
+            fontWeight: 800, 
+            color: '#1e293b', 
+            letterSpacing: '-0.025em',
+            margin: 0
+          }}>
+            {activeTab}
+          </h1>
+          <p style={{ color: '#64748b', marginTop: '0.5rem', fontWeight: '500' }}>
+            {activeTab === 'All Tickets' && 'Overview of all system incidents and tickets'}
+            {activeTab === 'Open Tickets' && 'Manage and monitor all currently active incidents'}
+            {activeTab === 'Assign Technician' && 'Allocate technical staff to pending tickets'}
+          </p>
+        </div>
+
         {/* Stats Grid - Hidden when not on All Tickets */}
         {activeTab === 'All Tickets' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
@@ -270,9 +288,13 @@ const IncidentManagement = () => {
                   <td style={{ padding: '1.5rem', color: '#64748b', fontWeight: '600' }}>{ticket.technician}</td>
                   <td style={{ padding: '1.5rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      <button style={{ background: '#eff6ff', color: '#2563eb', border: 'none', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>View</button>
+                      {activeTab !== 'Assign Technician' && (
+                        <button style={{ background: '#eff6ff', color: '#2563eb', border: 'none', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>View</button>
+                      )}
                       <button style={{ background: '#fef3c7', color: '#d97706', border: 'none', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>Assign</button>
-                      <button style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>Reject</button>
+                      {activeTab !== 'Assign Technician' && (
+                        <button style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer' }}>Reject</button>
+                      )}
                     </div>
                   </td>
                 </tr>
