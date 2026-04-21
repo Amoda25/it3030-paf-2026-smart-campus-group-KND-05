@@ -23,7 +23,7 @@ import {
   Clock,
   Calendar
 } from 'lucide-react';
-import campusHero from '../assets/campus_hero_new.png'; // Using the newer hero image
+import campusHero from '../assets/campus_hero_new.png';
 import facilitiesHero from '../assets/facilities_hero.png';
 import resourceBlue from '../assets/blue_resource.png';
 import systemsBlue from '../assets/blue_systems.png';
@@ -95,41 +95,46 @@ const HomePage = () => {
     <div className="home-page" style={{ background: 'var(--bg-deep)', overflowX: 'hidden' }}>
       
       {/* 1. Hero Banner Section */}
-      <section className="relative" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '120px 0' }}>
+      <section className="relative" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '0' }}>
+        {/* Background image — blurred & darkened */}
         <div 
-          className="absolute inset-0" 
           style={{ 
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
             backgroundImage: `url(${campusHero})`, 
             backgroundSize: 'cover', 
-            backgroundPosition: 'center', 
+            backgroundPosition: 'center',
+            filter: 'blur(3px) brightness(0.45)',
             zIndex: 1,
-            filter: 'brightness(0.6)'
+            transform: 'scale(1.05)'
           }}
         ></div>
+        {/* Extra dark overlay for text clarity */}
         <div 
-          className="absolute inset-0" 
           style={{ 
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.4) 100%)', 
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'linear-gradient(135deg, rgba(10, 18, 40, 0.7) 0%, rgba(10, 18, 40, 0.4) 100%)', 
             zIndex: 2 
           }}
         ></div>
         
-        <div className="container relative" style={{ zIndex: 3 }}>
+        {/* Hero text — full width, left aligned */}
+        <div className="container relative" style={{ zIndex: 3, flex: 1, display: 'flex', alignItems: 'center', paddingTop: '160px', paddingBottom: '100px' }}>
           <div className={`animate-fade-in ${isVisible ? 'opacity-100' : 'opacity-0'}`} style={{ maxWidth: '800px', transition: 'all 1s ease-out' }}>
-            <div style={{ display: 'inline-flex', padding: '8px 24px', background: 'rgba(59, 130, 246, 0.2)', backdropFilter: 'blur(10px)', color: '#60a5fa', borderRadius: '99px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
-              <Star size={14} style={{ marginRight: '8px' }} /> Discover the Future of Campus Life
-            </div>
-            <h1 style={{ fontSize: '5rem', fontWeight: 800, color: 'white', lineHeight: 1.05, marginBottom: '1.5rem', textShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-              Empower Your <span className="hero-gradient-text">Academic</span> Journey
+            <p style={{ color: '#93c5fd', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1rem' }}>
+              DO YOU NEED ANY HELP?
+            </p>
+            <h1 style={{ fontSize: '5rem', fontWeight: 900, color: 'white', lineHeight: 1.02, marginBottom: '1.8rem', textTransform: 'uppercase', textShadow: '0 2px 20px rgba(0,0,0,0.6)', letterSpacing: '-0.01em' }}>
+              WELCOME TO<br />
+              <span className="hero-gradient-text">UniHub</span>
             </h1>
-            <p style={{ fontSize: '1.25rem', color: 'rgba(255, 255, 255, 0.9)', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '1.15rem', color: 'rgba(255, 255, 255, 0.88)', marginBottom: '2.8rem', lineHeight: 1.75, maxWidth: '550px' }}>
               UniHub provides a seamless digital ecosystem for resource booking, maintenance tracking, and real-time campus connectivity.
             </p>
             <div className="flex items-center gap-4">
-              <Link to="/facilities" className="btn btn-primary" style={{ padding: '1.1rem 2.8rem', fontSize: '1.1rem', boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4)' }}>
-                Explore Facilities <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+              <Link to="/facilities" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(59, 130, 246, 0.45)' }}>
+                Explore Facilities <ArrowRight size={18} style={{ marginLeft: '8px' }} />
               </Link>
-              <Link to="/book" className="btn btn-primary" style={{ padding: '1.1rem 2.8rem', fontSize: '1.1rem', boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4)' }}>
+              <Link to="/book" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(59, 130, 246, 0.45)' }}>
                 Book Now
               </Link>
             </div>
@@ -146,9 +151,6 @@ const HomePage = () => {
               <span style={{ color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.85rem', letterSpacing: '0.1em' }}>Campus Highlights</span>
               <h2 style={{ fontSize: '3rem', fontWeight: 800, marginTop: '0.5rem' }}>Popular Facilities</h2>
             </div>
-            <Link to="/facilities" className="btn btn-outline" style={{ borderRadius: '99px' }}>
-              View All Facilities <ChevronRight size={18} />
-            </Link>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2.5rem' }}>
