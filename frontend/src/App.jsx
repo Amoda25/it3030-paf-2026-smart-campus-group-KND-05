@@ -13,6 +13,7 @@ import BookingsPage from './components/BookingsPage';
 import BookingForm from './components/BookingForm';
 import MyBookings from './components/MyBookings';
 import IncidentsPage from './components/IncidentsPage';
+import IncidentManagement from './components/IncidentManagement';
 import AdminPage from './components/AdminPage';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Route path="/book" element={<BookingForm />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/incidents" element={<IncidentsPage />} />
+            <Route path="/incident-management" element={<IncidentManagement />} />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </main>
