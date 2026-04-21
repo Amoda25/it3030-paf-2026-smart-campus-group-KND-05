@@ -29,6 +29,8 @@ const Header = () => {
           <Link to="/courses" className="nav-link" style={{ fontWeight: '600' }}>Courses</Link>
           <Link to="/facilities" className="nav-link" style={{ fontWeight: '600' }}>Facilities</Link>
           <Link to="/incidents" className="nav-link" style={{ fontWeight: '600' }}>Ticket</Link>
+          <Link to="/book" className="nav-link" style={{ fontWeight: '600' }}>Book Resource</Link>
+          <Link to="/my-bookings" className="nav-link" style={{ fontWeight: '600' }}>My Bookings</Link>
           <Link to="/dashboard" className="nav-link" style={{ fontWeight: '600' }}>Dashboard</Link>
           <Link to="/about" className="nav-link" style={{ fontWeight: '600' }}>About Us</Link>
           <Link to="/contact" className="nav-link" style={{ fontWeight: '600' }}>Contact Us</Link>
@@ -63,6 +65,8 @@ const Header = () => {
             <Link to="/courses" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
             <Link to="/facilities" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Facilities</Link>
             <Link to="/incidents" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Ticket</Link>
+            <Link to="/book" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Book Resource</Link>
+            <Link to="/my-bookings" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>My Bookings</Link>
             <Link to="/dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
             <Link to="/about" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
             <Link to="/contact" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>

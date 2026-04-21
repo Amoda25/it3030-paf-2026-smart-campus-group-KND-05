@@ -24,7 +24,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/bookings/**").permitAll()
                 // Everything else requires authentication
                 .anyRequest().authenticated()
             );
