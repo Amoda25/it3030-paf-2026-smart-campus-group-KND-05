@@ -23,7 +23,10 @@ import {
   Clock,
   Calendar
 } from 'lucide-react';
-import campusHero from '../assets/campus_hero_new.png';
+import campusHero from '../assets/sliit_campus.png';
+import graduate1 from '../assets/graduate1.png';
+import graduate2 from '../assets/graduate2.png';
+import graduate3 from '../assets/graduate3.png';
 import facilitiesHero from '../assets/facilities_hero.png';
 import resourceBlue from '../assets/blue_resource.png';
 import systemsBlue from '../assets/blue_systems.png';
@@ -32,9 +35,16 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
 
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [campusHero, graduate1, graduate2, graduate3];
+
   useEffect(() => {
     setIsVisible(true);
-  }, []);
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   const handleBookResource = (type, name) => {
     navigate('/book', { state: { resourceType: type, resourceName: name } });
@@ -95,35 +105,39 @@ const HomePage = () => {
     <div className="home-page" style={{ background: 'var(--bg-deep)', overflowX: 'hidden' }}>
       
       {/* 1. Hero Banner Section */}
-      <section className="relative" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '0' }}>
-        {/* Background image — blurred & darkened */}
-        <div 
-          style={{ 
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundImage: `url(${campusHero})`, 
-            backgroundSize: 'cover', 
-            backgroundPosition: 'center',
-            filter: 'blur(3px) brightness(0.45)',
-            zIndex: 1,
-            transform: 'scale(1.05)'
-          }}
-        ></div>
+      <section className="relative" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '0', overflow: 'hidden' }}>
+        {/* Sliding Background Images */}
+        {slides.map((slide, index) => (
+          <div 
+            key={index}
+            style={{ 
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundImage: `url(${slide})`, 
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center',
+              filter: 'brightness(0.5)',
+              zIndex: 1,
+              opacity: currentSlide === index ? 1 : 0,
+              transition: 'opacity 1.5s ease-in-out'
+            }}
+          ></div>
+        ))}
         {/* Extra dark overlay for text clarity */}
         <div 
           style={{ 
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'linear-gradient(135deg, rgba(10, 18, 40, 0.7) 0%, rgba(10, 18, 40, 0.4) 100%)', 
+            background: 'linear-gradient(to bottom, rgba(7, 19, 63, 0.85) 0%, rgba(7, 19, 63, 0.65) 100%)', 
             zIndex: 2 
           }}
         ></div>
         
         {/* Hero text — full width, left aligned */}
-        <div className="container relative" style={{ zIndex: 3, flex: 1, display: 'flex', alignItems: 'center', paddingTop: '160px', paddingBottom: '100px' }}>
-          <div className={`animate-fade-in ${isVisible ? 'opacity-100' : 'opacity-0'}`} style={{ maxWidth: '800px', transition: 'all 1s ease-out' }}>
-            <p style={{ color: '#93c5fd', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1rem' }}>
+        <div className="relative" style={{ zIndex: 3, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '180px', paddingBottom: '120px', paddingLeft: '7.0rem', paddingRight: '7.0rem' }}>
+          <div className={`animate-fade-in ${isVisible ? 'opacity-100' : 'opacity-0'}`} style={{ maxWidth: '800px', transition: 'all 1s ease-out', textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <p style={{ color: 'var(--secondary)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1rem' }}>
               DO YOU NEED ANY HELP?
             </p>
-            <h1 style={{ fontSize: '5rem', fontWeight: 900, color: 'white', lineHeight: 1.02, marginBottom: '1.8rem', textTransform: 'uppercase', textShadow: '0 2px 20px rgba(0,0,0,0.6)', letterSpacing: '-0.01em' }}>
+            <h1 style={{ fontSize: 'clamp(3rem, 8vw, 5rem)', fontWeight: 900, color: 'white', lineHeight: 1.02, marginBottom: '1.8rem', textTransform: 'uppercase', textShadow: '0 2px 20px rgba(0,0,0,0.6)', letterSpacing: '-0.01em' }}>
               WELCOME TO<br />
               <span className="hero-gradient-text">UniHub</span>
             </h1>
@@ -131,10 +145,10 @@ const HomePage = () => {
               UniHub provides a seamless digital ecosystem for resource booking, maintenance tracking, and real-time campus connectivity.
             </p>
             <div className="flex items-center gap-4">
-              <Link to="/facilities" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(59, 130, 246, 0.45)' }}>
+              <Link to="/facilities" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(242, 106, 0, 0.4)' }}>
                 Explore Facilities <ArrowRight size={18} style={{ marginLeft: '8px' }} />
               </Link>
-              <Link to="/book" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(59, 130, 246, 0.45)' }}>
+              <Link to="/book" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(242, 106, 0, 0.4)' }}>
                 Book Now
               </Link>
             </div>
@@ -195,12 +209,12 @@ const HomePage = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '2rem' }}>
             {announcements.map((news) => (
               <div key={news.id} style={{ display: 'flex', gap: '1.5rem', padding: '1.5rem', borderRadius: '24px', border: '1px solid var(--border-light)', transition: 'all 0.3s ease' }} onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'} onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-light)'}>
-                <div style={{ width: '64px', height: '64px', background: 'var(--secondary)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', flexShrink: 0 }}>
+                <div style={{ width: '64px', height: '64px', background: 'rgba(242, 106, 0, 0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--secondary)', flexShrink: 0 }}>
                   <Newspaper size={30} />
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'white', background: 'var(--primary)', padding: '2px 10px', borderRadius: '99px' }}>{news.category}</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'white', background: 'var(--secondary)', padding: '2px 10px', borderRadius: '99px' }}>{news.category}</span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <Clock size={12} /> {news.date}
                     </span>
@@ -220,7 +234,7 @@ const HomePage = () => {
       {/* 5. Newsletter / Call to Action */}
       <section className="section-padding">
         <div className="container">
-          <div className="glass" style={{ padding: '5rem', borderRadius: '48px', background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)', position: 'relative', overflow: 'hidden' }}>
+          <div className="glass" style={{ padding: '5rem', borderRadius: '48px', background: 'linear-gradient(135deg, var(--primary) 0%, #040b2a 100%)', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '300px', height: '300px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
             <div style={{ position: 'absolute', bottom: '-50px', left: '-50px', width: '200px', height: '200px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
             
