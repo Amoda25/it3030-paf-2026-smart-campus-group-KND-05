@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Ticket, 
   Clock, 
@@ -20,41 +20,42 @@ const IncidentManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Status');
 
-  // Sample Ticket Data
-  const [tickets] = useState([
-    {
-      id: 'INC-1001',
-      title: 'Projector not working',
-      subtitle: 'Projector Issue • Nethmi',
-      location: 'Lab 02',
-      priority: 'HIGH',
-      status: 'OPEN',
-      technician: 'Not Assigned'
-    },
-    {
-      id: 'INC-1002',
-      title: 'Air conditioning fault',
-      subtitle: 'Air Conditioning Issue • Kasun',
-      location: 'Lecture Hall A',
-      priority: 'MEDIUM',
-      status: 'IN_PROGRESS',
-      technician: 'Amal Perera'
-    },
-    {
-      id: 'INC-1003',
-      title: 'Network connectivity issue',
-      subtitle: 'Internet Issue • Kamal',
-      location: 'Staff Room',
-      priority: 'HIGH',
-      status: 'RESOLVED',
-      technician: 'Sunil Shantha'
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const fetchTickets = async () => {
+    try {
+      const response = await fetch('http://localhost:8081/api/tickets');
+      if (!response.ok) throw new Error('Failed to fetch tickets');
+      const data = await response.json();
+      
+      // Map backend data to frontend format if needed
+      const formattedTickets = data.map(ticket => ({
+        id: ticket.ticketId,
+        title: ticket.issueTitle,
+        subtitle: `${ticket.category} • ${ticket.fullName}`,
+        location: ticket.location,
+        priority: ticket.priority,
+        status: ticket.status,
+        technician: ticket.technician
+      }));
+      
+      setTickets(formattedTickets);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const stats = [
-    { label: 'Open Tickets', count: 2, color: '#3b82f6' },
-    { label: 'In Progress', count: 2, color: '#8b5cf6' },
-    { label: 'Resolved', count: 1, color: '#10b981' }
+    { label: 'Open Tickets', count: tickets.filter(t => t.status === 'OPEN').length, color: '#3b82f6' },
+    { label: 'In Progress', count: tickets.filter(t => t.status === 'IN_PROGRESS').length, color: '#8b5cf6' },
+    { label: 'Resolved', count: tickets.filter(t => t.status === 'RESOLVED').length, color: '#10b981' }
   ];
 
   const getPriorityStyle = (priority) => {
