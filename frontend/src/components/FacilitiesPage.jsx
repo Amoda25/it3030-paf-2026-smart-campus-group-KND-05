@@ -568,7 +568,6 @@ const FacilitiesPage = () => {
           )}
 
           {activeView === 'add' && (
-<<<<<<< HEAD
             <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '3rem' }}>
               <div className="glass" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', padding: '2.5rem' }}>
                 <div style={{ marginBottom: '2rem' }}>
@@ -816,97 +815,6 @@ const FacilitiesPage = () => {
                     </p>
                  </div>
               </div>
-=======
-            <div style={{ maxWidth: '900px' }}>
-              <form onSubmit={handleSubmit} className="glass p-10" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>FACILITY NAME</label>
-                        <input 
-                            type="text" 
-                            placeholder="e.g. Innovation Hall A"
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.name ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.name ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.name}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
-                        />
-                        {errors.name && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.name}</span>}
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>RESOURCE TYPE</label>
-                        <select 
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem', height: '46px' }}
-                            value={formData.type}
-                            onChange={(e) => handleInputChange('type', e.target.value)}
-                        >
-                            <option>Lecture Hall</option>
-                            <option>Lab</option>
-                            <option>Meeting Room</option>
-                            <option>Studios</option>
-                            <option>Equipment</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>CAPACITY (PEOPLE/UNITS)</label>
-                        <input 
-                            type="number" 
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.capacity ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.capacity ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.capacity}
-                            onChange={(e) => handleInputChange('capacity', e.target.value)}
-                        />
-                        {errors.capacity && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.capacity}</span>}
-                    </div>
-                    <div className="flex flex-col gap-3">
-                        <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>CAMPUS LOCATION</label>
-                        <input 
-                            type="text" 
-                            placeholder="e.g. West Wing, Floor 2"
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.location ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.location ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.location}
-                            onChange={(e) => handleInputChange('location', e.target.value)}
-                        />
-                        {errors.location && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.location}</span>}
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-3 mb-6">
-                    <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>FACILITY IMAGE URL</label>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <input 
-                            type="text" 
-                            placeholder="https://images.unsplash.com/..."
-                            style={{ flex: 1, padding: '0.85rem 1rem', borderRadius: '10px', border: errors.imageUrl ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.imageUrl ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
-                            value={formData.imageUrl}
-                            onChange={(e) => handleInputChange('imageUrl', e.target.value)}
-                        />
-                        {formData.imageUrl && (
-                            <div style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ebeef2' }}>
-                                <img src={formData.imageUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
-                            </div>
-                        )}
-                    </div>
-                    {errors.imageUrl && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.imageUrl}</span>}
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Provide a direct link to an image (Unsplash, Imgur, etc.)</p>
-                </div>
-
-                <div className="flex flex-col gap-3 mb-8">
-                    <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>RESOURCE DESCRIPTION</label>
-                    <textarea 
-                        style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.description ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.description ? '#fef2f2' : '#f8fafc', outline: 'none', minHeight: '100px', resize: 'none', fontSize: '0.9rem' }}
-                        value={formData.description}
-                        placeholder="Detail the technical specs or room features..."
-                        onChange={(e) => handleInputChange('description', e.target.value)}
-                    />
-                    {errors.description && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.description}</span>}
-                </div>
-
-                <button type="submit" disabled={submitting} className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
-                    {submitting ? 'Registering node...' : 'Register Facility'}
-                </button>
-              </form>
->>>>>>> Amo/dashboard
             </div>
           )}
 
@@ -1021,4 +929,3 @@ const FacilitiesPage = () => {
 };
 
 export default FacilitiesPage;
-
