@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Building2, 
   Globe, 
@@ -9,8 +10,18 @@ import {
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const location = useLocation();
+  const hasSidebar = location.pathname === '/facilities-dashboard' || location.pathname === '/incident-management';
+
   return (
-    <footer className="main-footer" style={{ position: 'relative', padding: '60px 0 30px', overflow: 'hidden', background: '#0f172a' }}>
+    <footer className="main-footer" style={{ 
+      position: 'relative', 
+      padding: '60px 0 30px', 
+      overflow: 'hidden', 
+      background: '#0f172a',
+      marginLeft: hasSidebar ? '280px' : '0',
+      transition: 'margin-left 0.3s ease'
+    }}>
       
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2.5rem' }}>

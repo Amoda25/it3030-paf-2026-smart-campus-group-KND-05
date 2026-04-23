@@ -27,9 +27,13 @@ import {
   Clock,
   ArrowUpRight,
   ClipboardList,
-  Building2,
-  ShieldCheck,
+  Building2, 
+  ShieldCheck, 
   Zap,
+  Tag,
+  AlignLeft,
+  Image as ImageIcon,
+  FileText,
   Dumbbell,
   CheckCircle2,
   AlertCircle
@@ -69,7 +73,7 @@ const FacilitiesPage = () => {
     
     if (!formData.location.trim()) newErrors.location = "Location is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
-    if (formData.imageUrl && !formData.imageUrl.startsWith('http')) newErrors.imageUrl = "Please enter a valid URL";
+    if (formData.imageUrl && !formData.imageUrl.startsWith('http') && !formData.imageUrl.startsWith('data:')) newErrors.imageUrl = "Please enter a valid URL";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -88,6 +92,22 @@ const FacilitiesPage = () => {
     }
     
     setErrors(newErrors);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image size should be less than 2MB");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handleInputChange('imageUrl', reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   useEffect(() => {
@@ -590,253 +610,216 @@ const FacilitiesPage = () => {
           )}
 
           {activeView === 'add' && (
-            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '3rem' }}>
-              <div className="glass" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', padding: '2.5rem' }}>
-                <div style={{ marginBottom: '2rem' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>Resource Registration</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Fill in the specifications to deploy a new campus asset.</p>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }} className="animate-fade-in">
+              <form onSubmit={handleSubmit} className="glass" style={{ 
+                borderRadius: '32px', 
+                background: '#fff', 
+                border: '1px solid rgba(0,0,0,0.05)',
+                padding: '3.5rem',
+                boxShadow: '0 40px 80px -20px rgba(0,0,0,0.08)'
+              }}>
+                
+                {/* Form Header */}
+                <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+                    <div style={{ 
+                        width: '64px', 
+                        height: '64px', 
+                        background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)', 
+                        borderRadius: '20px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        color: '#fff',
+                        margin: '0 auto 1.5rem',
+                        boxShadow: '0 15px 30px -10px rgba(59, 130, 246, 0.5)'
+                    }}>
+                        <Plus size={32} />
+                    </div>
+                    <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>Deploy New Asset</h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Configure and register a new operational node to the campus infrastructure.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                    <div className="flex flex-col gap-2">
-                       <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>FACILITY NAME</label>
-                       <div style={{ position: 'relative' }}>
-                          <Info size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
-                          <input 
-                              type="text" 
-                              placeholder="e.g. Spartan Gym Cluster"
-                              style={{ 
-                                width: '100%',
-                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
-                                borderRadius: '12px', 
-                                border: errors.name ? '2px solid #ef4444' : '1px solid #e2e8f0', 
-                                background: '#f8fafc', 
-                                outline: 'none', 
-                                fontSize: '0.9rem',
-                                transition: 'all 0.2s ease'
-                              }}
-                              value={formData.name}
-                              onChange={(e) => setFormData({...formData, name: e.target.value})}
-                          />
-                       </div>
-                       {errors.name && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.name}</span>}
-                    </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+                    {/* Left Column: Identification */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                            <Tag size={18} className="text-primary" />
+                            <h3 style={{ fontSize: '1rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0f172a' }}>Identification</h3>
+                        </div>
 
-                    <div className="flex flex-col gap-2">
-                        <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>RESOURCE TYPE</label>
-                        <div style={{ position: 'relative' }}>
-                          <Box size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
-                          <select 
-                              style={{ 
-                                width: '100%',
-                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
-                                borderRadius: '12px', 
-                                border: '1px solid #e2e8f0', 
-                                background: '#f8fafc', 
-                                outline: 'none', 
-                                fontSize: '0.9rem',
-                                cursor: 'pointer'
-                              }}
-                              value={formData.type}
-                              onChange={(e) => setFormData({...formData, type: e.target.value})}
-                          >
-                              <option>Lecture Hall</option>
-                              <option>Lab</option>
-                              <option>Gym</option>
-                              <option>Meeting Room</option>
-                              <option>Studios</option>
-                              <option>Equipment</option>
-                          </select>
+                        <div className="flex flex-col gap-2">
+                            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.02em' }}>FACILITY NAME</label>
+                            <div style={{ position: 'relative' }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="e.g. Advanced AI Robotics Lab"
+                                    style={{ width: '100%', padding: '0.85rem 1rem 0.85rem 2.75rem', borderRadius: '14px', border: errors.name ? '1px solid #ef4444' : '1px solid #e2e8f0', background: errors.name ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem', transition: 'all 0.2s' }}
+                                    value={formData.name}
+                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                />
+                                <Box size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            </div>
+                            {errors.name && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.name}</span>}
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.02em' }}>RESOURCE TYPE</label>
+                            <div style={{ position: 'relative' }}>
+                                <select 
+                                    style={{ width: '100%', padding: '0.85rem 1rem 0.85rem 2.75rem', borderRadius: '14px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none', fontSize: '0.9rem', height: '48px', appearance: 'none', cursor: 'pointer' }}
+                                    value={formData.type}
+                                    onChange={(e) => handleInputChange('type', e.target.value)}
+                                >
+                                    <option>Lecture Hall</option>
+                                    <option>Lab</option>
+                                    <option>Meeting Room</option>
+                                    <option>Studios</option>
+                                    <option>Equipment</option>
+                                </select>
+                                <LayoutGrid size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+                                <ChevronRight size={18} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%) rotate(90deg)', color: '#94a3b8', pointerEvents: 'none' }} />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.02em' }}>CAPACITY & OCCUPANCY</label>
+                            <div style={{ position: 'relative' }}>
+                                <input 
+                                    type="number" 
+                                    placeholder="0"
+                                    style={{ width: '100%', padding: '0.85rem 1rem 0.85rem 2.75rem', borderRadius: '14px', border: errors.capacity ? '1px solid #ef4444' : '1px solid #e2e8f0', background: errors.capacity ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                                    value={formData.capacity}
+                                    onChange={(e) => handleInputChange('capacity', e.target.value)}
+                                />
+                                <Users size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            </div>
+                            {errors.capacity && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.capacity}</span>}
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.02em' }}>CAMPUS LOCATION</label>
+                            <div style={{ position: 'relative' }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="e.g. West Wing, Floor 2"
+                                    style={{ width: '100%', padding: '0.85rem 1rem 0.85rem 2.75rem', borderRadius: '14px', border: errors.location ? '1px solid #ef4444' : '1px solid #e2e8f0', background: errors.location ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                                    value={formData.location}
+                                    onChange={(e) => handleInputChange('location', e.target.value)}
+                                />
+                                <MapPin size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            </div>
+                            {errors.location && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.location}</span>}
                         </div>
                     </div>
-                  </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                    <div className="flex flex-col gap-2">
-                        <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>MAX CAPACITY</label>
-                        <div style={{ position: 'relative' }}>
-                          <Users size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
-                          <input 
-                              type="number" 
-                              placeholder="0"
-                              style={{ 
-                                width: '100%',
-                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
-                                borderRadius: '12px', 
-                                border: errors.capacity ? '2px solid #ef4444' : '1px solid #e2e8f0', 
-                                background: '#f8fafc', 
-                                outline: 'none', 
-                                fontSize: '0.9rem'
-                              }}
-                              value={formData.capacity}
-                              onChange={(e) => setFormData({...formData, capacity: e.target.value})}
-                          />
+                    {/* Right Column: Configuration & Media */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                            <ImageIcon size={18} className="text-primary" />
+                            <h3 style={{ fontSize: '1rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0f172a' }}>Media & Details</h3>
                         </div>
-                        {errors.capacity && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.capacity}</span>}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>CAMPUS LOCATION</label>
-                        <div style={{ position: 'relative' }}>
-                          <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
-                          <input 
-                              type="text" 
-                              placeholder="e.g. Sports Complex, Level 2"
-                              style={{ 
-                                width: '100%',
-                                padding: '0.85rem 1rem 0.85rem 2.5rem', 
-                                borderRadius: '12px', 
-                                border: errors.location ? '2px solid #ef4444' : '1px solid #e2e8f0', 
-                                background: '#f8fafc', 
-                                outline: 'none', 
-                                fontSize: '0.9rem'
-                              }}
-                              value={formData.location}
-                              onChange={(e) => setFormData({...formData, location: e.target.value})}
-                          />
+
+                        <div className="flex flex-col gap-2">
+                            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.02em' }}>VISUAL REPRESENTATION</label>
+                            <div 
+                                style={{ 
+                                    border: '2px dashed #e2e8f0', 
+                                    borderRadius: '20px', 
+                                    padding: '1.5rem', 
+                                    textAlign: 'center', 
+                                    background: '#f8fafc',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    minHeight: '160px',
+                                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                                onMouseOut={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
+                                onClick={() => document.getElementById('facility-image-input').click()}
+                            >
+                                {formData.imageUrl ? (
+                                    <>
+                                        <img src={formData.imageUrl} alt="Preview" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.15 }} />
+                                        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                            <div style={{ width: '90px', height: '90px', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', marginBottom: '0.75rem', border: '3px solid #fff' }}>
+                                                <img src={formData.imageUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                            <span style={{ fontWeight: '700', color: 'var(--primary)', fontSize: '0.8rem' }}>Change Image</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', marginBottom: '0.75rem' }}>
+                                            <Camera size={24} />
+                                        </div>
+                                        <div style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.85rem' }}>Choose File</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>PNG, JPG or JPEG up to 2MB</div>
+                                    </>
+                                )}
+                                <input id="facility-image-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+                            </div>
                         </div>
-                        {errors.location && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.location}</span>}
-                    </div>
-                  </div>
 
-                  <div className="flex flex-col gap-2">
-                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>IMAGE RESOURCE LINK (OPTIONAL)</label>
-                    <div style={{ position: 'relative' }}>
-                      <Globe size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
-                      <input 
-                          type="text" 
-                          placeholder="https://images.unsplash.com/photo-..."
-                          style={{ 
-                            width: '100%',
-                            padding: '0.85rem 1rem 0.85rem 2.5rem', 
-                            borderRadius: '12px', 
-                            border: '1px solid #e2e8f0', 
-                            background: '#f8fafc', 
-                            outline: 'none', 
-                            fontSize: '0.9rem'
-                          }}
-                          value={formData.imageUrl}
-                          onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                      />
+                        <div className="flex flex-col gap-2">
+                            <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.02em' }}>DETAILED DESCRIPTION</label>
+                            <div style={{ position: 'relative' }}>
+                                <textarea 
+                                    style={{ width: '100%', padding: '1rem 1rem 1rem 2.75rem', borderRadius: '14px', border: errors.description ? '1px solid #ef4444' : '1px solid #e2e8f0', background: errors.description ? '#fef2f2' : '#f8fafc', outline: 'none', minHeight: '148px', resize: 'none', fontSize: '0.9rem', transition: 'all 0.2s' }}
+                                    value={formData.description}
+                                    placeholder="Detail the technical specs or room features..."
+                                    onChange={(e) => handleInputChange('description', e.target.value)}
+                                />
+                                <AlignLeft size={18} style={{ position: 'absolute', left: '1rem', top: '1.25rem', color: '#94a3b8' }} />
+                            </div>
+                            {errors.description && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.description}</span>}
+                        </div>
                     </div>
-                  </div>
+                </div>
 
-                  <div className="flex flex-col gap-2">
-                    <label style={{ fontSize: '0.75rem', fontWeight: '800', color: '#1e293b', opacity: 0.6 }}>TECHNICAL DESCRIPTION</label>
-                    <textarea 
+                <div style={{ marginTop: '3.5rem', paddingTop: '2.5rem', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'center' }}>
+                    <button 
+                        type="submit" 
+                        disabled={submitting} 
+                        className="btn-hover"
                         style={{ 
-                          padding: '1rem', 
-                          borderRadius: '12px', 
-                          border: errors.description ? '2px solid #ef4444' : '1px solid #e2e8f0', 
-                          background: '#f8fafc', 
-                          outline: 'none', 
-                          minHeight: '120px', 
-                          resize: 'none', 
-                          fontSize: '0.9rem' 
+                            width: '100%', 
+                            maxWidth: '400px',
+                            padding: '1.25rem', 
+                            borderRadius: '16px', 
+                            fontSize: '1.1rem', 
+                            fontWeight: '800', 
+                            background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.75rem',
+                            boxShadow: '0 15px 35px -10px rgba(59, 130, 246, 0.4)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
-                        value={formData.description}
-                        placeholder="Detail the technical specs, amenities, or special equipment available..."
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    />
-                    {errors.description && <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '600' }}>{errors.description}</span>}
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    disabled={submitting} 
-                    className="btn btn-primary" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '1.25rem', 
-                      borderRadius: '16px', 
-                      fontSize: '1rem', 
-                      fontWeight: '800',
-                      marginTop: '1rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.75rem'
-                    }}
-                  >
-                    {submitting ? (
-                      <>
-                        <div className="animate-spin" style={{ width: '20px', height: '20px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%' }}></div>
-                        Deploying Asset...
-                      </>
-                    ) : (
-                      <>
-                        <Zap size={20} /> Deploy Facility
-                      </>
-                    )}
-                  </button>
-
-                  {successMsg && (
-                      <div className="animate-fade-in mt-6" style={{ padding: '1rem', background: '#ecfdf5', color: '#059669', borderRadius: '12px', textAlign: 'center', fontWeight: '700', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', border: '1px solid #10b981' }}>
-                          <CheckCircle2 size={18} /> {successMsg}
-                      </div>
-                  )}
-                </form>
-              </div>
-
-              {/* Live Preview Side */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                 <div style={{ padding: '1rem 0' }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: '900', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>VIRTUAL TWIN PREVIEW</h4>
-                    <div className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.03)', background: '#fff', opacity: formData.name ? 1 : 0.5, transition: 'opacity 0.3s ease' }}>
-                        <div style={{ position: 'relative', height: '200px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-                            <img 
-                              src={formData.imageUrl || getDefaultImage(formData.type)} 
-                              alt="Background" 
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7)' }}
-                            />
-                          </div>
-                          <div style={{ position: 'relative', zIndex: 1, color: '#fff', textAlign: 'center' }}>
-                             {getIcon(formData.type)}
-                             <div style={{ fontSize: '0.75rem', fontWeight: '700', marginTop: '0.5rem', opacity: 0.8 }}>SYSTEM RENDERING</div>
-                          </div>
-                          <div style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', background: 'var(--primary)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                             {formData.type}
-                          </div>
-                        </div>
-                        
-                        <div style={{ padding: '1.5rem' }}>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '0.5rem', color: '#0f172a' }}>{formData.name || "Untitled Facility"}</h3>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.85rem' }}>
-                            <MapPin size={16} /> {formData.location || "Assign a location"}
-                          </div>
-                          
-                          <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
-                            <div className="flex items-center gap-3">
-                              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Users size={16} className="text-primary" />
-                              </div>
-                              <div>
-                                <div style={{ fontWeight: '800', fontSize: '0.95rem', color: '#1e293b' }}>{formData.capacity || "0"}</div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '700', textTransform: 'uppercase' }}>Allowed Node Usage</div>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 12px rgba(16, 185, 129, 0.5)' }}></div>
-                               <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#10b981' }}>SYSTEM ONLINE</span>
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                 </div>
-
-                 <div className="glass" style={{ padding: '1.5rem', borderRadius: '1.5rem', background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', color: '#fff', border: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                       <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <AlertCircle size={20} className="text-primary" />
-                       </div>
-                       <div style={{ fontWeight: '700', fontSize: '1rem' }}>Registration Protocol</div>
-                    </div>
-                    <p style={{ fontSize: '0.8rem', opacity: 0.7, lineHeight: 1.6 }}>
-                       All new facilities must undergo a safety certification before operational activation. Deploying a node here will trigger a maintenance review cycle.
-                    </p>
-                 </div>
-              </div>
+                    >
+                        {submitting ? (
+                            <>
+                                <div className="loading-spinner" style={{ width: '20px', height: '20px', border: '3px solid rgba(255,255,255,0.3)', borderTop: '3px solid #fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+                                Deploying Node...
+                            </>
+                        ) : (
+                            <>
+                                <ShieldCheck size={22} />
+                                Complete Registration
+                            </>
+                        )}
+                    </button>
+                </div>
+              </form>
             </div>
           )}
 
