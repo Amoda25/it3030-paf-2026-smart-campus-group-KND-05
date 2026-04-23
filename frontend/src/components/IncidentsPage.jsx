@@ -49,6 +49,7 @@ const IncidentsPage = () => {
     fullName: '',
     email: '',
     contactNumber: '',
+    faculty: 'Select faculty',
     preferredTime: '',
     issueTitle: '',
     category: 'Select category',
