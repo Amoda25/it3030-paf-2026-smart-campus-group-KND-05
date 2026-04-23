@@ -52,6 +52,37 @@ const FacilitiesPage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [errors, setErrors] = useState({});
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Facility name is required";
+    if (!formData.capacity) newErrors.capacity = "Capacity is required";
+    else if (formData.capacity < 0) newErrors.capacity = "Capacity cannot be negative";
+    else if (formData.capacity == 0) newErrors.capacity = "Capacity must be greater than 0";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (formData.imageUrl && !formData.imageUrl.startsWith('http')) newErrors.imageUrl = "Please enter a valid URL";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    let newErrors = { ...errors };
+    
+    if (field === 'capacity') {
+      if (value < 0) newErrors.capacity = "Negative values are not allowed";
+      else if (value == 0) newErrors.capacity = "Capacity must be greater than 0";
+      else delete newErrors.capacity;
+    } else if (errors[field]) {
+      delete newErrors[field];
+    }
+    
+    setErrors(newErrors);
+  };
 
   useEffect(() => {
     fetchFacilities();
@@ -72,42 +103,63 @@ const FacilitiesPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    alert("Submitting form...");
+    console.log("Submit button clicked", formData);
+    if (!validateForm()) {
+      alert("Please fix the errors in the form first (red fields).");
+      return;
+    }
+    
     setSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+        capacity: parseInt(formData.capacity, 10),
+        availabilityWindows: ["08:00-17:00"] // Default availability as expected by backend
+      };
+      
       const response = await fetch('http://localhost:8081/api/facilities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
+
       if (response.ok) {
-        setSuccessMsg('Facility registered successfully!');
-        setFormData({ name: '', type: 'Lecture Hall', capacity: '', location: '', status: 'ACTIVE', description: '', imageUrl: '' });
+        alert("🎉 Success! Facility registered correctly in the database.");
+        setShowSuccessModal(true);
+        setFormData({ 
+          name: '', 
+          type: 'Lecture Hall', 
+          capacity: '', 
+          location: '', 
+          status: 'ACTIVE', 
+          description: '', 
+          imageUrl: '' 
+        });
         fetchFacilities();
         setTimeout(() => {
-          setSuccessMsg('');
+          setShowSuccessModal(false);
           setActiveView('inventory');
-        }, 2000);
-        } else {
-          let errorMessage = 'Failed to register facility';
-          try {
-            const errorText = await response.text();
-            if (errorText) {
-              const errorData = JSON.parse(errorText);
-              errorMessage = errorData.message || errorMessage;
-            }
-          } catch (e) {
-            // Not JSON or empty body, keep default message
+        }, 5000);
+      } else {
+        let errorMessage = 'Failed to register facility';
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage = errorText;
           }
-          throw new Error(errorMessage);
+        } catch (e) {
+          // ignore
         }
-      } catch (error) {
-        console.error('Error adding facility:', error);
-        setSuccessMsg(`Error: ${error.message}`);
-        setTimeout(() => setSuccessMsg(''), 5000);
-      } finally {
-        setSubmitting(false);
+        alert("❌ Failed to register: " + errorMessage);
       }
-    };
+    } catch (error) {
+      console.error('Error adding facility:', error);
+      alert("CRITICAL ERROR: " + error.message + "\n\n1. Ensure your backend is running on port 8081.\n2. Check the browser console (F12) for more details.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const categories = ['All', 'Lecture Hall', 'Lab', 'Meeting Room', 'Studios', 'Equipment'];
 
@@ -143,6 +195,63 @@ const FacilitiesPage = () => {
       paddingTop: '80px',
       display: 'flex'
     }}>
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div className="glass" style={{
+            background: '#fff',
+            padding: '3rem',
+            borderRadius: '2.5rem',
+            textAlign: 'center',
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            transform: 'scale(1)',
+            animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              background: '#dcfce7',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.5rem',
+              color: '#10b981'
+            }}>
+              <ShieldCheck size={40} />
+            </div>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.75rem' }}>Success!</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: '1.6', marginBottom: '2rem' }}>
+              The new facility has been successfully registered and is now live on the campus network.
+            </p>
+            <button 
+              onClick={() => {
+                setShowSuccessModal(false);
+                setActiveView('inventory');
+              }}
+              className="btn btn-primary" 
+              style={{ width: '100%', borderRadius: '15px', padding: '1rem', fontWeight: '700', cursor: 'pointer' }}
+            >
+              Back to Inventory
+            </button>
+          </div>
+        </div>
+      )}
       {/* Sidebar Navigation */}
       <aside style={{ 
         width: '280px', 
@@ -411,20 +520,20 @@ const FacilitiesPage = () => {
                     <div className="flex flex-col gap-3">
                         <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>FACILITY NAME</label>
                         <input 
-                            required
                             type="text" 
                             placeholder="e.g. Innovation Hall A"
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.name ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.name ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
                             value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
                         />
+                        {errors.name && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.name}</span>}
                     </div>
                     <div className="flex flex-col gap-3">
                         <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>RESOURCE TYPE</label>
                         <select 
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem', height: '46px' }}
                             value={formData.type}
-                            onChange={(e) => setFormData({...formData, type: e.target.value})}
+                            onChange={(e) => handleInputChange('type', e.target.value)}
                         >
                             <option>Lecture Hall</option>
                             <option>Lab</option>
@@ -439,45 +548,60 @@ const FacilitiesPage = () => {
                     <div className="flex flex-col gap-3">
                         <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>CAPACITY (PEOPLE/UNITS)</label>
                         <input 
-                            required
                             type="number" 
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.capacity ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.capacity ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
                             value={formData.capacity}
-                            onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+                            onChange={(e) => handleInputChange('capacity', e.target.value)}
                         />
+                        {errors.capacity && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.capacity}</span>}
                     </div>
                     <div className="flex flex-col gap-3">
                         <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>CAMPUS LOCATION</label>
                         <input 
-                            required
                             type="text" 
                             placeholder="e.g. West Wing, Floor 2"
-                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                            style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.location ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.location ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
                             value={formData.location}
-                            onChange={(e) => setFormData({...formData, location: e.target.value})}
+                            onChange={(e) => handleInputChange('location', e.target.value)}
                         />
+                        {errors.location && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.location}</span>}
                     </div>
+                </div>
+
+                <div className="flex flex-col gap-3 mb-6">
+                    <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>FACILITY IMAGE URL</label>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <input 
+                            type="text" 
+                            placeholder="https://images.unsplash.com/..."
+                            style={{ flex: 1, padding: '0.85rem 1rem', borderRadius: '10px', border: errors.imageUrl ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.imageUrl ? '#fef2f2' : '#f8fafc', outline: 'none', fontSize: '0.9rem' }}
+                            value={formData.imageUrl}
+                            onChange={(e) => handleInputChange('imageUrl', e.target.value)}
+                        />
+                        {formData.imageUrl && (
+                            <div style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ebeef2' }}>
+                                <img src={formData.imageUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
+                            </div>
+                        )}
+                    </div>
+                    {errors.imageUrl && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.imageUrl}</span>}
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Provide a direct link to an image (Unsplash, Imgur, etc.)</p>
                 </div>
 
                 <div className="flex flex-col gap-3 mb-8">
                     <label style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)' }}>RESOURCE DESCRIPTION</label>
                     <textarea 
-                        style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #ebeef2', background: '#f8fafc', outline: 'none', minHeight: '100px', resize: 'none', fontSize: '0.9rem' }}
+                        style={{ padding: '0.85rem 1rem', borderRadius: '10px', border: errors.description ? '1px solid #ef4444' : '1px solid #ebeef2', background: errors.description ? '#fef2f2' : '#f8fafc', outline: 'none', minHeight: '100px', resize: 'none', fontSize: '0.9rem' }}
                         value={formData.description}
                         placeholder="Detail the technical specs or room features..."
-                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        onChange={(e) => handleInputChange('description', e.target.value)}
                     />
+                    {errors.description && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600' }}>{errors.description}</span>}
                 </div>
 
                 <button type="submit" disabled={submitting} className="btn btn-primary" style={{ width: '100%', padding: '1rem', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
                     {submitting ? 'Registering node...' : 'Register Facility'}
                 </button>
-
-                {successMsg && (
-                    <div className="animate-fade-in mt-6" style={{ padding: '1rem', background: '#dcfce7', color: '#15803d', borderRadius: '10px', textAlign: 'center', fontWeight: '700', fontSize: '0.9rem' }}>
-                        {successMsg}
-                    </div>
-                )}
               </form>
             </div>
           )}
@@ -542,6 +666,14 @@ const FacilitiesPage = () => {
         .card-hover:hover {
           transform: translateY(-8px);
           box-shadow: 0 20px 40px rgba(0,0,0,0.06) !important;
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(40px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
       `}</style>
     </div>
