@@ -21,7 +21,6 @@ public class Ticket {
     private String faculty;
     private String email;
     private String contactNumber;
-    private String faculty;
     private String preferredTime;
     private String issueTitle;
     private String category;
