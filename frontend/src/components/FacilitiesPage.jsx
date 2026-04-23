@@ -36,7 +36,10 @@ import {
   FileText,
   Dumbbell,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Inbox,
+  XCircle,
+  User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -61,6 +64,8 @@ const FacilitiesPage = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [fetchingBookings, setFetchingBookings] = useState(false);
 
   const validateForm = () => {
     let newErrors = {};
@@ -112,7 +117,38 @@ const FacilitiesPage = () => {
 
   useEffect(() => {
     fetchFacilities();
+    fetchBookings();
   }, []);
+
+  const fetchBookings = async () => {
+    setFetchingBookings(true);
+    try {
+      const response = await fetch('http://localhost:8081/api/bookings');
+      if (response.ok) {
+        const data = await response.json();
+        // Sort by newest first
+        setBookings(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setFetchingBookings(false);
+    }
+  };
+
+  const handleUpdateBookingStatus = async (id, status) => {
+    try {
+      const response = await fetch(`http://localhost:8081/api/bookings/${id}/status?status=${status}`, {
+        method: 'PUT'
+      });
+      if (response.ok) {
+        // Update local state
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+      }
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+    }
+  };
 
   const fetchFacilities = async () => {
     setLoading(true);
@@ -512,26 +548,25 @@ const FacilitiesPage = () => {
           )}
 
           {activeView === 'inventory' && (
-            <div className="animate-fade-in">
+            <div>
               {/* Category Filter */}
-              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '1.5rem', marginBottom: '1rem', scrollbarWidth: 'none' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '1.5rem', marginBottom: '1rem' }}>
                 {categories.map(cat => (
                   <button 
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className="btn-hover"
                     style={{ 
-                      padding: '0.6rem 1.5rem', 
-                      borderRadius: '14px', 
-                      border: selectedCategory === cat ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                      background: selectedCategory === cat ? 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)' : '#fff',
-                      color: selectedCategory === cat ? '#fff' : '#64748b',
+                      padding: '0.6rem 1.25rem', 
+                      borderRadius: '10px', 
+                      border: '1px solid',
+                      borderColor: selectedCategory === cat ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
+                      background: selectedCategory === cat ? 'var(--primary)' : '#fff',
+                      color: selectedCategory === cat ? '#fff' : 'var(--text-muted)',
                       fontSize: '0.85rem',
-                      fontWeight: selectedCategory === cat ? '800' : '600',
+                      fontWeight: '700',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      whiteSpace: 'nowrap',
-                      boxShadow: selectedCategory === cat ? '0 10px 20px -10px rgba(59, 130, 246, 0.5)' : 'none'
+                      transition: 'all 0.2s ease',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {cat}
@@ -540,99 +575,67 @@ const FacilitiesPage = () => {
               </div>
 
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '100px 0', background: '#fff', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.05)' }}>
-                  <div className="loading-spinner" style={{ border: '4px solid #f8fafc', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '48px', height: '48px', animation: 'spin 1s linear infinite', margin: '0 auto 1.5rem' }}></div>
-                  <p style={{ color: '#64748b', fontWeight: '600', fontSize: '1.1rem' }}>Synchronizing Asset Database...</p>
+                <div style={{ textAlign: 'center', padding: '100px 0' }}>
+                  <div className="loading-spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
+                  <p className="text-muted">Orchestrating resources...</p>
                 </div>
               ) : filteredFacilities.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                   {filteredFacilities.map(fac => (
-                    <div key={fac.id} className="glass card-hover" style={{ 
-                        borderRadius: '24px', 
-                        overflow: 'hidden', 
-                        border: '1px solid rgba(0,0,0,0.05)', 
-                        background: '#fff', 
-                        position: 'relative',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        boxShadow: '0 20px 40px -20px rgba(0,0,0,0.05)'
-                    }}>
-                      {/* Image Header */}
-                      <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
+                    <div key={fac.id} className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.03)', background: '#fff', position: 'relative' }}>
+                      <div style={{ position: 'relative', height: '200px' }}>
                         <img 
                           src={fac.imageUrl || getDefaultImage(fac.type)} 
                           alt={fac.name} 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
-                          onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                          onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
-                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)', pointerEvents: 'none' }}></div>
-                        
-                        <div style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', padding: '6px 12px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+                        <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 255, 255, 0.95)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
                            {getIcon(fac.type)} {fac.type}
                         </div>
-
-                        <div style={{ position: 'absolute', bottom: '1.25rem', left: '1.25rem', display: 'flex', gap: '0.5rem' }}>
-                           <div style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '800', background: fac.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.9)' : 'rgba(245, 158, 11, 0.9)', color: '#fff', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }}></div>
-                             {fac.status}
-                           </div>
-                        </div>
-
-                        <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }}>
-                           <button className="btn-hover" style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0f172a', border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+                        <div style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}>
+                           <button className="glass" style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0f172a', border: 'none' }}>
                              <MoreVertical size={18} />
                            </button>
                         </div>
                       </div>
                       
-                      {/* Card Body */}
-                      <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ marginBottom: '1rem' }}>
-                          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.35rem', lineHeight: 1.2 }}>{fac.name}</h3>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.85rem', fontWeight: '600' }}>
-                            <MapPin size={14} className="text-primary" /> {fac.location}
-                          </div>
+                      <div style={{ padding: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                          <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a' }}>{fac.name}</h3>
+                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: fac.status === 'ACTIVE' ? '#10b981' : '#f59e0b', marginTop: '6px' }}></div>
                         </div>
                         
-                        <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '1.5rem', flex: 1 }}>
-                            {fac.description || "Premium campus facility equipped with modern infrastructure to support academic and operational needs."}
-                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
+                          <MapPin size={14} /> {fac.location}
+                        </div>
                         
-                        <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem', marginTop: 'auto' }}>
+                        <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
                           <div className="flex items-center gap-3">
-                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               <Users size={16} className="text-primary" />
                             </div>
                             <div>
-                               <div style={{ fontWeight: '800', fontSize: '1rem', color: '#0f172a', lineHeight: 1 }}>{fac.capacity}</div>
-                               <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.05em', marginTop: '2px' }}>Capacity</div>
+                               <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#0f172a' }}>{fac.capacity}</div>
+                               <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Capacity</div>
                             </div>
                           </div>
                           
                           <Link 
                             to="/book" 
                             state={{ resourceName: fac.name, resourceType: fac.type }}
-                            className="btn-hover"
+                            className="btn btn-primary"
                             style={{ 
-                              padding: '0.6rem 1.25rem', 
+                              padding: '8px 16px', 
                               borderRadius: '10px', 
-                              fontSize: '0.85rem', 
+                              fontSize: '0.8rem', 
                               fontWeight: '700',
                               textDecoration: 'none',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '0.4rem',
-                              background: '#f8fafc',
-                              color: 'var(--primary)',
-                              border: '1px solid rgba(59, 130, 246, 0.2)',
-                              transition: 'all 0.2s ease'
+                              justifyContent: 'center'
                             }}
-                            onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
-                            onMouseOut={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = 'var(--primary)'; }}
                           >
-                            <Settings size={14} /> Manage
+                            Book Now
                           </Link>
                         </div>
                       </div>
@@ -640,14 +643,156 @@ const FacilitiesPage = () => {
                   ))}
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', padding: '100px 0', background: '#fff', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 20px 40px -20px rgba(0,0,0,0.02)' }}>
-                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                      <Package size={32} className="text-muted" style={{ opacity: 0.5 }} />
-                  </div>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>No Assets Found</h3>
-                  <p style={{ color: '#64748b', fontSize: '0.95rem', maxWidth: '400px', margin: '0 auto' }}>We couldn't locate any facilities matching your current filter criteria. Try adjusting the category or search term.</p>
+                <div style={{ textAlign: 'center', padding: '100px 0', background: '#fff', borderRadius: '2rem' }}>
+                  <Info size={48} className="text-muted mx-auto mb-4" style={{ opacity: 0.3 }} />
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: '700' }}>No facilities found</h3>
+                  <p className="text-muted">Try adjusting your search filters or categories.</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeView === 'bookings' && (
+            <div className="glass animate-fade-in" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+              {/* Panel Header */}
+              <div style={{ padding: '2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(to right, #fff, #f8fafc)' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>Student Booking Requests</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Review and manage incoming facility reservation requests.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(234, 179, 8, 0.1)', color: '#b45309', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
+                    {bookings.filter(b => b.status === 'PENDING').length} PENDING
+                  </div>
+                  <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.1)', color: '#047857', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></div>
+                    {bookings.filter(b => b.status === 'APPROVED').length} APPROVED
+                  </div>
+                  <button onClick={fetchBookings} style={{ padding: '8px 16px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #e2e8f0', fontWeight: '700', fontSize: '0.8rem', cursor: 'pointer', color: '#475569' }}>↻ Refresh</button>
+                </div>
+              </div>
+
+              <div style={{ padding: '1.5rem 2.5rem 2.5rem' }}>
+                {fetchingBookings ? (
+                  <div style={{ textAlign: 'center', padding: '60px' }}>
+                    <div style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
+                    <p style={{ color: 'var(--text-muted)' }}>Loading requests...</p>
+                  </div>
+                ) : bookings.length > 0 ? (
+                  <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0.75rem' }}>
+                    <thead>
+                      <tr style={{ textAlign: 'left' }}>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Student</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Facility & Time</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Purpose</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Requirements</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Status</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.map((booking) => (
+                        <tr key={booking.id} style={{ background: '#f8fafc' }}>
+                          {/* Student */}
+                          <td style={{ padding: '1.25rem 1rem', borderRadius: '12px 0 0 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), #1e40af)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                                <User size={18} />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#1e293b' }}>{booking.userName || '—'}</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>ID: {booking.userId || '—'}</div>
+                                {booking.userFaculty && <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{booking.userFaculty}</div>}
+                              </div>
+                            </div>
+                          </td>
+                          {/* Facility & Time */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <div style={{ fontWeight: '800', fontSize: '0.85rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <Building2 size={14} style={{ color: 'var(--secondary)' }} />
+                              {booking.facilityName || '—'}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              {booking.startTime ? new Date(booking.startTime).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Date N/A'}
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                              {booking.startTime ? new Date(booking.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                              {booking.endTime ? ` – ${new Date(booking.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
+                            </div>
+                          </td>
+                          {/* Purpose */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{ padding: '5px 12px', borderRadius: '8px', background: '#eff6ff', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '800' }}>
+                              {booking.purpose || '—'}
+                            </span>
+                            {booking.participantsCount > 0 && (
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Users size={12} /> {booking.participantsCount} participants
+                              </div>
+                            )}
+                          </td>
+                          {/* Requirements */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                              {booking.projectorNeeded && <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#f0fdf4', color: '#15803d', fontSize: '0.65rem', fontWeight: '800' }}>📽 Projector</span>}
+                              {booking.microphoneNeeded && <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#fdf4ff', color: '#7e22ce', fontSize: '0.65rem', fontWeight: '800' }}>🎤 Mic</span>}
+                              {booking.acNeeded && <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#eff6ff', color: '#1d4ed8', fontSize: '0.65rem', fontWeight: '800' }}>❄ AC</span>}
+                              {!booking.projectorNeeded && !booking.microphoneNeeded && !booking.acNeeded && <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>None</span>}
+                            </div>
+                          </td>
+                          {/* Status */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{
+                              padding: '6px 12px',
+                              borderRadius: '8px',
+                              fontSize: '0.7rem',
+                              fontWeight: '800',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              background: booking.status === 'PENDING' ? '#fffbeb' : booking.status === 'APPROVED' ? '#ecfdf5' : '#fef2f2',
+                              color: booking.status === 'PENDING' ? '#b45309' : booking.status === 'APPROVED' ? '#047857' : '#991b1b'
+                            }}>
+                              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></div>
+                              {booking.status}
+                            </span>
+                          </td>
+                          {/* Actions */}
+                          <td style={{ padding: '1.25rem 1rem', borderRadius: '0 12px 12px 0' }}>
+                            {booking.status === 'PENDING' ? (
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                  onClick={() => handleUpdateBookingStatus(booking.id, 'APPROVED')}
+                                  style={{ padding: '8px 14px', borderRadius: '8px', background: '#ecfdf5', color: '#059669', border: '1px solid #bbf7d0', cursor: 'pointer', fontWeight: '800', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                  title="Approve"
+                                >
+                                  <CheckCircle2 size={15} /> Approve
+                                </button>
+                                <button
+                                  onClick={() => handleUpdateBookingStatus(booking.id, 'REJECTED')}
+                                  style={{ padding: '8px 14px', borderRadius: '8px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', fontWeight: '800', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                  title="Reject"
+                                >
+                                  <XCircle size={15} /> Reject
+                                </button>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '700' }}>Processed</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '80px' }}>
+                    <Inbox size={56} style={{ color: '#cbd5e1', margin: '0 auto 1rem', display: 'block' }} />
+                    <h4 style={{ color: '#64748b', fontWeight: '700', fontSize: '1.2rem' }}>No Booking Requests Yet</h4>
+                    <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '0.5rem' }}>When students submit booking requests, they will appear here for your review.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
