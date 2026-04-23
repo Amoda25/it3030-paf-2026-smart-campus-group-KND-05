@@ -447,8 +447,25 @@ const FacilitiesPage = () => {
                           <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>{fac.name}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{fac.type} • {fac.location}</div>
                         </div>
-                        <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', background: fac.status === 'ACTIVE' ? '#dcfce7' : '#fef3c7', color: fac.status === 'ACTIVE' ? '#15803d' : '#92400e' }}>
-                          {fac.status}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', background: fac.status === 'ACTIVE' ? '#dcfce7' : '#fef3c7', color: fac.status === 'ACTIVE' ? '#15803d' : '#92400e' }}>
+                            {fac.status}
+                          </div>
+                          <Link 
+                            to="/book" 
+                            state={{ resourceName: fac.name, resourceType: fac.type }}
+                            style={{ 
+                              padding: '4px 12px', 
+                              borderRadius: '8px', 
+                              background: 'var(--primary)', 
+                              color: '#fff', 
+                              fontSize: '0.7rem', 
+                              fontWeight: '700',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            Book Now
+                          </Link>
                         </div>
                       </div>
                     ))}
@@ -540,18 +557,23 @@ const FacilitiesPage = () => {
                             </div>
                           </div>
                           
-                          <button style={{ 
-                            padding: '6px 12px', 
-                            borderRadius: '8px', 
-                            background: '#f8fafc', 
-                            border: '1px solid #e2e8f0', 
-                            fontSize: '0.75rem', 
-                            fontWeight: '700', 
-                            color: 'var(--text-muted)',
-                            cursor: 'pointer'
-                          }}>
-                            Details
-                          </button>
+                          <Link 
+                            to="/book" 
+                            state={{ resourceName: fac.name, resourceType: fac.type }}
+                            className="btn btn-primary"
+                            style={{ 
+                              padding: '8px 16px', 
+                              borderRadius: '10px', 
+                              fontSize: '0.8rem', 
+                              fontWeight: '700',
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            Book Now
+                          </Link>
                         </div>
                       </div>
                     </div>
