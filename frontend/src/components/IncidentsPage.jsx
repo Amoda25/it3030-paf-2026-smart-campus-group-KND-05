@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, 
   Wrench, 
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 
 const IncidentsPage = () => {
+  const navigate = useNavigate();
   const formRef = useRef(null);
   const fileInputRef = useRef(null);
   const [priority, setPriority] = useState('MEDIUM');
@@ -35,7 +37,7 @@ const IncidentsPage = () => {
     preferredTime: '',
     issueTitle: '',
     category: 'Select category',
-    location: 'Select location',
+    location: '',
     description: ''
   });
 
@@ -69,7 +71,7 @@ const IncidentsPage = () => {
     }
     
     if (formData.category === 'Select category') newErrors.category = "Please select a category";
-    if (formData.location === 'Select location' || !formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.location || !formData.location.trim()) newErrors.location = "Location is required";
     
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
@@ -107,7 +109,7 @@ const IncidentsPage = () => {
       else if (value.length < 10) fieldError = "Please provide more details (min 10 chars)";
     }
     if (name === 'category' && value === 'Select category') fieldError = "Please select a category";
-    if (name === 'location' && (!value.trim() || value === 'Select location')) fieldError = "Location is required";
+    if (name === 'location' && (!value || !value.trim())) fieldError = "Location is required";
 
     setErrors(prev => ({ ...prev, [name]: fieldError }));
   };
@@ -147,7 +149,7 @@ const IncidentsPage = () => {
       preferredTime: '',
       issueTitle: '',
       category: 'Select category',
-      location: 'Select location',
+      location: '',
       description: ''
     });
     setPriority('MEDIUM');
@@ -159,32 +161,51 @@ const IncidentsPage = () => {
     setImages([]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      // Scroll to the first error if needed
       return;
     }
     
-    // Generate mock ticket data
-    const ticketInfo = {
-      id: `INC-${Math.floor(1000 + Math.random() * 9000)}`,
-      category: formData.category,
-      location: formData.location,
-      submittedAt: new Date().toLocaleString('en-US', { 
-        year: 'numeric', 
-        month: '2-digit', 
-        day: '2-digit', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: true 
-      }).replace(/\//g, '-')
-    };
+    try {
+      const response = await fetch('http://localhost:8081/api/tickets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          priority: priority
+        }),
+      });
 
-    console.log('Submitting:', { ...formData, ...ticketInfo, priority });
-    setSubmittedTicket(ticketInfo);
-    setIsSubmitted(true);
+      if (!response.ok) {
+        throw new Error('Failed to submit ticket');
+      }
+
+      const savedTicket = await response.json();
+      
+      const ticketInfo = {
+        id: savedTicket.ticketId,
+        category: savedTicket.category,
+        location: savedTicket.location,
+        submittedAt: new Date(savedTicket.submittedAt).toLocaleString('en-US', { 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit', 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          hour12: true 
+        }).replace(/\//g, '-')
+      };
+
+      setSubmittedTicket(ticketInfo);
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting ticket:', error);
+      alert('There was an error submitting your ticket. Please try again.');
+    }
   };
 
   return (
@@ -296,6 +317,7 @@ const IncidentsPage = () => {
               {/* Bottom Buttons - Aligned Left */}
               <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-start' }}>
                 <button 
+                  onClick={() => navigate('/dashboard')}
                   className="btn-hover"
                   style={{ 
                     background: '#059669', 
@@ -533,7 +555,7 @@ const IncidentsPage = () => {
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      placeholder="Location"
+                      placeholder="Select location"
                       style={{ 
                         width: '100%', 
                         padding: '1rem 1.25rem', 
