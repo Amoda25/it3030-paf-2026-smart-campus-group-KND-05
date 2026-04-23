@@ -548,25 +548,26 @@ const FacilitiesPage = () => {
           )}
 
           {activeView === 'inventory' && (
-            <div>
+            <div className="animate-fade-in">
               {/* Category Filter */}
-              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '1.5rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '1.5rem', marginBottom: '1rem', scrollbarWidth: 'none' }}>
                 {categories.map(cat => (
                   <button 
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
+                    className="btn-hover"
                     style={{ 
-                      padding: '0.6rem 1.25rem', 
-                      borderRadius: '10px', 
-                      border: '1px solid',
-                      borderColor: selectedCategory === cat ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
-                      background: selectedCategory === cat ? 'var(--primary)' : '#fff',
-                      color: selectedCategory === cat ? '#fff' : 'var(--text-muted)',
+                      padding: '0.6rem 1.5rem', 
+                      borderRadius: '14px', 
+                      border: selectedCategory === cat ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                      background: selectedCategory === cat ? 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)' : '#fff',
+                      color: selectedCategory === cat ? '#fff' : '#64748b',
                       fontSize: '0.85rem',
-                      fontWeight: '700',
+                      fontWeight: selectedCategory === cat ? '800' : '600',
                       cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      whiteSpace: 'nowrap'
+                      transition: 'all 0.3s ease',
+                      whiteSpace: 'nowrap',
+                      boxShadow: selectedCategory === cat ? '0 10px 20px -10px rgba(59, 130, 246, 0.5)' : 'none'
                     }}
                   >
                     {cat}
@@ -575,67 +576,99 @@ const FacilitiesPage = () => {
               </div>
 
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '100px 0' }}>
-                  <div className="loading-spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
-                  <p className="text-muted">Orchestrating resources...</p>
+                <div style={{ textAlign: 'center', padding: '100px 0', background: '#fff', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div className="loading-spinner" style={{ border: '4px solid #f8fafc', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '48px', height: '48px', animation: 'spin 1s linear infinite', margin: '0 auto 1.5rem' }}></div>
+                  <p style={{ color: '#64748b', fontWeight: '600', fontSize: '1.1rem' }}>Synchronizing Asset Database...</p>
                 </div>
               ) : filteredFacilities.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '2rem' }}>
                   {filteredFacilities.map(fac => (
-                    <div key={fac.id} className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.03)', background: '#fff', position: 'relative' }}>
-                      <div style={{ position: 'relative', height: '200px' }}>
+                    <div key={fac.id} className="glass card-hover" style={{ 
+                        borderRadius: '24px', 
+                        overflow: 'hidden', 
+                        border: '1px solid rgba(0,0,0,0.05)', 
+                        background: '#fff', 
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        boxShadow: '0 20px 40px -20px rgba(0,0,0,0.05)'
+                    }}>
+                      {/* Image Header */}
+                      <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
                         <img 
                           src={fac.imageUrl || getDefaultImage(fac.type)} 
                           alt={fac.name} 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                          onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                          onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
                         />
-                        <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 255, 255, 0.95)', padding: '6px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)', pointerEvents: 'none' }}></div>
+                        
+                        <div style={{ position: 'absolute', top: '1.25rem', left: '1.25rem', background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', padding: '6px 12px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '800', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
                            {getIcon(fac.type)} {fac.type}
                         </div>
-                        <div style={{ position: 'absolute', bottom: '1rem', right: '1rem' }}>
-                           <button className="glass" style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0f172a', border: 'none' }}>
+
+                        <div style={{ position: 'absolute', bottom: '1.25rem', left: '1.25rem', display: 'flex', gap: '0.5rem' }}>
+                           <div style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '800', background: fac.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.9)' : 'rgba(245, 158, 11, 0.9)', color: '#fff', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#fff' }}></div>
+                             {fac.status}
+                           </div>
+                        </div>
+
+                        <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }}>
+                           <button className="btn-hover" style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0f172a', border: 'none', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
                              <MoreVertical size={18} />
                            </button>
                         </div>
                       </div>
                       
-                      <div style={{ padding: '1.5rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
-                          <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a' }}>{fac.name}</h3>
-                          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: fac.status === 'ACTIVE' ? '#10b981' : '#f59e0b', marginTop: '6px' }}></div>
+                      {/* Card Body */}
+                      <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ marginBottom: '1rem' }}>
+                          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.35rem', lineHeight: 1.2 }}>{fac.name}</h3>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.85rem', fontWeight: '600' }}>
+                            <MapPin size={14} className="text-primary" /> {fac.location}
+                          </div>
                         </div>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', marginBottom: '1.25rem', fontSize: '0.85rem' }}>
-                          <MapPin size={14} /> {fac.location}
-                        </div>
+                        <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '1.5rem', flex: 1 }}>
+                            {fac.description || "Premium campus facility equipped with modern infrastructure to support academic and operational needs."}
+                        </p>
                         
-                        <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
+                        <div className="flex justify-between items-center" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem', marginTop: 'auto' }}>
                           <div className="flex items-center gap-3">
-                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               <Users size={16} className="text-primary" />
                             </div>
                             <div>
-                               <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#0f172a' }}>{fac.capacity}</div>
-                               <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Capacity</div>
+                               <div style={{ fontWeight: '800', fontSize: '1rem', color: '#0f172a', lineHeight: 1 }}>{fac.capacity}</div>
+                               <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '0.05em', marginTop: '2px' }}>Capacity</div>
                             </div>
                           </div>
                           
                           <Link 
                             to="/book" 
                             state={{ resourceName: fac.name, resourceType: fac.type }}
-                            className="btn btn-primary"
+                            className="btn-hover"
                             style={{ 
-                              padding: '8px 16px', 
+                              padding: '0.6rem 1.25rem', 
                               borderRadius: '10px', 
-                              fontSize: '0.8rem', 
+                              fontSize: '0.85rem', 
                               fontWeight: '700',
                               textDecoration: 'none',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              justifyContent: 'center'
+                              justifyContent: 'center',
+                              gap: '0.4rem',
+                              background: '#f8fafc',
+                              color: 'var(--primary)',
+                              border: '1px solid rgba(59, 130, 246, 0.2)',
+                              transition: 'all 0.2s ease'
                             }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = 'var(--primary)'; }}
                           >
-                            Book Now
+                            <Settings size={14} /> Manage
                           </Link>
                         </div>
                       </div>
@@ -643,10 +676,12 @@ const FacilitiesPage = () => {
                   ))}
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', padding: '100px 0', background: '#fff', borderRadius: '2rem' }}>
-                  <Info size={48} className="text-muted mx-auto mb-4" style={{ opacity: 0.3 }} />
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: '700' }}>No facilities found</h3>
-                  <p className="text-muted">Try adjusting your search filters or categories.</p>
+                <div style={{ textAlign: 'center', padding: '100px 0', background: '#fff', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 20px 40px -20px rgba(0,0,0,0.02)' }}>
+                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                      <Package size={32} className="text-muted" style={{ opacity: 0.5 }} />
+                  </div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>No Assets Found</h3>
+                  <p style={{ color: '#64748b', fontSize: '0.95rem', maxWidth: '400px', margin: '0 auto' }}>We couldn't locate any facilities matching your current filter criteria. Try adjusting the category or search term.</p>
                 </div>
               )}
             </div>
