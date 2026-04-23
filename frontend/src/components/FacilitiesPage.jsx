@@ -929,4 +929,3 @@ const FacilitiesPage = () => {
 };
 
 export default FacilitiesPage;
-
