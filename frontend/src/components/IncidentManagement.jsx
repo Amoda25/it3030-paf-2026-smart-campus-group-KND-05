@@ -92,23 +92,6 @@ const IncidentManagement = () => {
     }
   };
 
-  const handlePriorityChange = async (newPriority) => {
-    try {
-      const response = await fetch(`http://localhost:8081/api/tickets/${selectedTicket.ticketId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priority: newPriority })
-      });
-      if (!response.ok) throw new Error('Failed to update priority');
-      const updated = await response.json();
-      
-      setSelectedTicket(updated);
-      setTickets(prev => prev.map(t => t.ticketId === updated.ticketId ? { ...t, priority: updated.priority } : t));
-    } catch (error) {
-      console.error('Error updating priority:', error);
-      alert('Error updating priority.');
-    }
-  };
 
   const handleSaveResolution = async () => {
     try {
@@ -780,51 +763,6 @@ const IncidentManagement = () => {
                     </div>
                   </div>
 
-                  {/* Quick Controls Grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                    <div style={{ padding: '1.5rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: '#fff' }}>
-                      <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b', marginBottom: '1rem' }}>Assign Technician</h3>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <input 
-                          type="text" 
-                          placeholder="Technician Name"
-                          id="techInput"
-                          style={{ flex: 1, padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc', fontSize: '0.9rem', outline: 'none' }}
-                        />
-                        <button 
-                          onClick={() => handleAssign(selectedTicket.ticketId, document.getElementById('techInput').value)}
-                          style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '10px', fontWeight: '700', cursor: 'pointer' }}
-                        >
-                          Assign
-                        </button>
-                      </div>
-                    </div>
-
-                    <div style={{ padding: '1.5rem', borderRadius: '20px', border: '1px solid #f1f5f9', background: '#fff' }}>
-                      <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b', marginBottom: '1rem' }}>Change Priority</h3>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        {['LOW', 'MEDIUM', 'HIGH'].map(p => (
-                          <button
-                            key={p}
-                            onClick={() => handlePriorityChange(p)}
-                            style={{
-                              flex: 1,
-                              padding: '0.75rem',
-                              borderRadius: '10px',
-                              border: 'none',
-                              background: selectedTicket.priority === p ? '#3b82f6' : '#f1f5f9',
-                              color: selectedTicket.priority === p ? '#fff' : '#64748b',
-                              fontWeight: '700',
-                              fontSize: '0.8rem',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            {p}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                     <div style={{ 
