@@ -18,6 +18,7 @@ public class Ticket {
     private String id;
     private String ticketId; // e.g., INC-1001
     private String fullName;
+    private String faculty;
     private String email;
     private String contactNumber;
     private String faculty;

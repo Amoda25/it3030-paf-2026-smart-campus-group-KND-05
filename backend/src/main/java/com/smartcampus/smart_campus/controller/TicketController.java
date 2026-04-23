@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = "http://localhost:5173") // Adjust based on frontend URL
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"}) // Adjust based on frontend URL
 public class TicketController {
 
     @Autowired
