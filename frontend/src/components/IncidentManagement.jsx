@@ -11,7 +11,8 @@ import {
   XCircle,
   ShieldCheck,
   MoreVertical,
-  LayoutGrid
+  LayoutGrid,
+  Save
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -687,37 +688,56 @@ const IncidentManagement = () => {
                     <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: 1.6 }}>{selectedTicket.description}</p>
                   </div>
 
-                  {/* Attached Images (Mock) */}
+                  {/* Attached Images */}
                   <div style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9', background: '#fff' }}>
                     <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b', marginBottom: '1rem' }}>Attached Images</h3>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                      <div style={{ flex: 1, height: '150px', borderRadius: '12px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.8rem', overflow: 'hidden' }}>
-                        <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                      <div style={{ flex: 1, height: '150px', borderRadius: '12px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.8rem', overflow: 'hidden' }}>
-                         <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                      {(selectedTicket.images || []).length === 0 ? (
+                        <div style={{ color: '#94a3b8', fontSize: '0.85rem', padding: '1rem', background: '#f8fafc', borderRadius: '12px', width: '100%', textAlign: 'center' }}>No images attached to this ticket.</div>
+                      ) : (
+                        selectedTicket.images.map((img, i) => (
+                          <div key={i} style={{ width: '150px', height: '150px', borderRadius: '12px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.8rem', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                            <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={`Attachment ${i + 1}`} />
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
 
-                  {/* Resolution Note */}
-                  <div style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9', background: '#fff' }}>
-                    <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b', marginBottom: '1rem' }}>Resolution Note</h3>
-                    <textarea 
-                      value={resolutionNote}
-                      onChange={(e) => setResolutionNote(e.target.value)}
-                      placeholder="Add technician resolution note"
-                      style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc', fontSize: '0.95rem', minHeight: '100px', outline: 'none', marginBottom: '1rem' }}
-                    />
-                    <button 
-                      onClick={handleSaveResolution}
-                      style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '12px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)' }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                    >
-                      Save Resolution Note
-                    </button>
-                  </div>
+                  {/* Resolution Note - Only visible for Resolved/Closed tickets */}
+                  {(selectedTicket.status === 'RESOLVED' || selectedTicket.status === 'CLOSED') && (
+                    <div style={{ padding: '2rem', borderRadius: '24px', border: '1px solid #dcfce7', background: '#f0fdf4', position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', top: 0, right: 0, padding: '0.5rem 1rem', background: '#10b981', color: '#fff', fontSize: '0.7rem', fontWeight: '800', borderBottomLeftRadius: '12px' }}>FIXED</div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                        <div style={{ padding: '0.6rem', borderRadius: '12px', background: '#10b981', color: '#fff' }}>
+                          <UserCheck size={20} />
+                        </div>
+                        <div>
+                          <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#064e3b', margin: 0 }}>Resolution Summary</h3>
+                          <p style={{ fontSize: '0.8rem', color: '#059669', fontWeight: '600' }}>Official technician response for this incident</p>
+                        </div>
+                      </div>
+
+                      <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid #dcfce7', marginBottom: '1.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+                        <textarea 
+                          value={resolutionNote}
+                          onChange={(e) => setResolutionNote(e.target.value)}
+                          placeholder="Add or update technician resolution note"
+                          style={{ width: '100%', border: 'none', background: 'transparent', fontSize: '1rem', color: '#064e3b', fontWeight: '500', minHeight: '120px', outline: 'none', resize: 'none', lineHeight: 1.6 }}
+                        />
+                      </div>
+
+                      <button 
+                        onClick={handleSaveResolution}
+                        style={{ width: '100%', background: '#10b981', color: '#fff', border: 'none', padding: '1rem', borderRadius: '14px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.2)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+                      >
+                        <Save size={18} /> Update Resolution Note
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

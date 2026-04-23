@@ -66,6 +66,11 @@ public class TicketService {
             ticket.setRejectionReason(updatedTicket.getRejectionReason());
             changed = true;
         }
+
+        if (updatedTicket.getImages() != null) {
+            ticket.setImages(updatedTicket.getImages());
+            changed = true;
+        }
         
         return ticketRepository.save(ticket);
     }
