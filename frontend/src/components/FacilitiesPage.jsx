@@ -36,7 +36,10 @@ import {
   FileText,
   Dumbbell,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Inbox,
+  XCircle,
+  User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -61,6 +64,8 @@ const FacilitiesPage = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [fetchingBookings, setFetchingBookings] = useState(false);
 
   const validateForm = () => {
     let newErrors = {};
@@ -112,7 +117,38 @@ const FacilitiesPage = () => {
 
   useEffect(() => {
     fetchFacilities();
+    fetchBookings();
   }, []);
+
+  const fetchBookings = async () => {
+    setFetchingBookings(true);
+    try {
+      const response = await fetch('http://localhost:8081/api/bookings');
+      if (response.ok) {
+        const data = await response.json();
+        // Sort by newest first
+        setBookings(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      }
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    } finally {
+      setFetchingBookings(false);
+    }
+  };
+
+  const handleUpdateBookingStatus = async (id, status) => {
+    try {
+      const response = await fetch(`http://localhost:8081/api/bookings/${id}/status?status=${status}`, {
+        method: 'PUT'
+      });
+      if (response.ok) {
+        // Update local state
+        setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+      }
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+    }
+  };
 
   const fetchFacilities = async () => {
     setLoading(true);
@@ -341,7 +377,12 @@ const FacilitiesPage = () => {
               >
                 {item.icon}
                 {item.label}
-                {activeView === item.id && <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--primary)' }}></div>}
+                {item.id === 'bookings' && bookings.filter(b => b.status === 'PENDING').length > 0 && (
+                  <span style={{ marginLeft: 'auto', background: '#f59e0b', color: '#fff', borderRadius: '99px', fontSize: '0.65rem', fontWeight: '900', padding: '2px 8px', minWidth: '20px', textAlign: 'center' }}>
+                    {bookings.filter(b => b.status === 'PENDING').length}
+                  </span>
+                )}
+                {activeView === item.id && item.id !== 'bookings' && <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--primary)' }}></div>}
               </button>
             ))}
           </nav>
@@ -370,12 +411,14 @@ const FacilitiesPage = () => {
             <h1 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
               {activeView === 'overview' && 'Facilities Overview'}
               {activeView === 'inventory' && 'Asset Inventory'}
+              {activeView === 'bookings' && 'Booking Requests'}
               {activeView === 'add' && 'Facility Registration'}
               {activeView === 'maintenance' && 'Maintenance Log'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
               {activeView === 'overview' && 'Monitor and manage campus resources in real-time.'}
               {activeView === 'inventory' && 'Search and browse through all registered campus assets.'}
+              {activeView === 'bookings' && 'Review and action incoming student reservation requests.'}
               {activeView === 'add' && 'Deploy new operational nodes to the campus network.'}
               {activeView === 'maintenance' && 'Track and schedule facility maintenance cycles.'}
             </p>
@@ -606,6 +649,150 @@ const FacilitiesPage = () => {
                   <p className="text-muted">Try adjusting your search filters or categories.</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {activeView === 'bookings' && (
+            <div className="glass animate-fade-in" style={{ borderRadius: '2rem', background: '#fff', border: '1px solid rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+              {/* Panel Header */}
+              <div style={{ padding: '2.5rem', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(to right, #fff, #f8fafc)' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>Student Booking Requests</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Review and manage incoming facility reservation requests.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(234, 179, 8, 0.1)', color: '#b45309', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
+                    {bookings.filter(b => b.status === 'PENDING').length} PENDING
+                  </div>
+                  <div style={{ padding: '6px 14px', borderRadius: '20px', background: 'rgba(16, 185, 129, 0.1)', color: '#047857', fontSize: '0.75rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></div>
+                    {bookings.filter(b => b.status === 'APPROVED').length} APPROVED
+                  </div>
+                  <button onClick={fetchBookings} style={{ padding: '8px 16px', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #e2e8f0', fontWeight: '700', fontSize: '0.8rem', cursor: 'pointer', color: '#475569' }}>↻ Refresh</button>
+                </div>
+              </div>
+
+              <div style={{ padding: '1.5rem 2.5rem 2.5rem' }}>
+                {fetchingBookings ? (
+                  <div style={{ textAlign: 'center', padding: '60px' }}>
+                    <div style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }}></div>
+                    <p style={{ color: 'var(--text-muted)' }}>Loading requests...</p>
+                  </div>
+                ) : bookings.length > 0 ? (
+                  <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0.75rem' }}>
+                    <thead>
+                      <tr style={{ textAlign: 'left' }}>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Student</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Facility & Time</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Purpose</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Requirements</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Status</th>
+                        <th style={{ padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.map((booking) => (
+                        <tr key={booking.id} style={{ background: '#f8fafc' }}>
+                          {/* Student */}
+                          <td style={{ padding: '1.25rem 1rem', borderRadius: '12px 0 0 12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--primary), #1e40af)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                                <User size={18} />
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#1e293b' }}>{booking.userName || '—'}</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>ID: {booking.userId || '—'}</div>
+                                {booking.userFaculty && <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{booking.userFaculty}</div>}
+                              </div>
+                            </div>
+                          </td>
+                          {/* Facility & Time */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <div style={{ fontWeight: '800', fontSize: '0.85rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                              <Building2 size={14} style={{ color: 'var(--secondary)' }} />
+                              {booking.facilityName || '—'}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                              {booking.startTime ? new Date(booking.startTime).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Date N/A'}
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                              {booking.startTime ? new Date(booking.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                              {booking.endTime ? ` – ${new Date(booking.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
+                            </div>
+                          </td>
+                          {/* Purpose */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{ padding: '5px 12px', borderRadius: '8px', background: '#eff6ff', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '800' }}>
+                              {booking.purpose || '—'}
+                            </span>
+                            {booking.participantsCount > 0 && (
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Users size={12} /> {booking.participantsCount} participants
+                              </div>
+                            )}
+                          </td>
+                          {/* Requirements */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                              {booking.projectorNeeded && <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#f0fdf4', color: '#15803d', fontSize: '0.65rem', fontWeight: '800' }}>📽 Projector</span>}
+                              {booking.microphoneNeeded && <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#fdf4ff', color: '#7e22ce', fontSize: '0.65rem', fontWeight: '800' }}>🎤 Mic</span>}
+                              {booking.acNeeded && <span style={{ padding: '3px 8px', borderRadius: '6px', background: '#eff6ff', color: '#1d4ed8', fontSize: '0.65rem', fontWeight: '800' }}>❄ AC</span>}
+                              {!booking.projectorNeeded && !booking.microphoneNeeded && !booking.acNeeded && <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>None</span>}
+                            </div>
+                          </td>
+                          {/* Status */}
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{
+                              padding: '6px 12px',
+                              borderRadius: '8px',
+                              fontSize: '0.7rem',
+                              fontWeight: '800',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              background: booking.status === 'PENDING' ? '#fffbeb' : booking.status === 'APPROVED' ? '#ecfdf5' : '#fef2f2',
+                              color: booking.status === 'PENDING' ? '#b45309' : booking.status === 'APPROVED' ? '#047857' : '#991b1b'
+                            }}>
+                              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }}></div>
+                              {booking.status}
+                            </span>
+                          </td>
+                          {/* Actions */}
+                          <td style={{ padding: '1.25rem 1rem', borderRadius: '0 12px 12px 0' }}>
+                            {booking.status === 'PENDING' ? (
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button
+                                  onClick={() => handleUpdateBookingStatus(booking.id, 'APPROVED')}
+                                  style={{ padding: '8px 14px', borderRadius: '8px', background: '#ecfdf5', color: '#059669', border: '1px solid #bbf7d0', cursor: 'pointer', fontWeight: '800', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                  title="Approve"
+                                >
+                                  <CheckCircle2 size={15} /> Approve
+                                </button>
+                                <button
+                                  onClick={() => handleUpdateBookingStatus(booking.id, 'REJECTED')}
+                                  style={{ padding: '8px 14px', borderRadius: '8px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', fontWeight: '800', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                  title="Reject"
+                                >
+                                  <XCircle size={15} /> Reject
+                                </button>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '700' }}>Processed</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '80px' }}>
+                    <Inbox size={56} style={{ color: '#cbd5e1', margin: '0 auto 1rem', display: 'block' }} />
+                    <h4 style={{ color: '#64748b', fontWeight: '700', fontSize: '1.2rem' }}>No Booking Requests Yet</h4>
+                    <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '0.5rem' }}>When students submit booking requests, they will appear here for your review.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
