@@ -108,10 +108,14 @@ const StudentProfile = () => {
           background: 'linear-gradient(180deg, rgba(7, 19, 63, 0.4) 0%, rgba(7, 19, 63, 0.95) 100%)' 
         }}></div>
 
+        {/* Decorative Blobs */}
+        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '500px', height: '500px', background: 'var(--secondary)', borderRadius: '50%', filter: 'blur(150px)', opacity: 0.15 }}></div>
+        <div style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: '400px', height: '400px', background: 'var(--primary)', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.2 }}></div>
+
         <div className="container" style={{ position: 'relative', zIndex: 10, width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '3rem', flexWrap: 'wrap' }}>
             
-            {/* Avatar */}
+            {/* Avatar with Glow */}
             <div style={{ position: 'relative' }}>
               <div style={{ 
                 width: '180px', 
@@ -124,12 +128,26 @@ const StudentProfile = () => {
               }}>
                 <img src={student.profileImg} alt={student.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <button style={{ position: 'absolute', bottom: '-10px', right: '-10px', width: '44px', height: '44px', borderRadius: '14px', background: 'var(--secondary)', color: '#fff', border: '4px solid var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <button style={{ 
+                position: 'absolute', 
+                bottom: '-10px', 
+                right: '-10px', 
+                width: '44px', 
+                height: '44px', 
+                borderRadius: '14px', 
+                background: 'var(--secondary)', 
+                color: '#fff', 
+                border: '4px solid var(--primary)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}>
                 <Camera size={20} />
               </button>
             </div>
 
-            {/* Name and Info */}
+            {/* Name and Basic Info */}
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                 <span style={{ padding: '4px 12px', borderRadius: '99px', background: 'rgba(242, 106, 0, 0.2)', color: 'var(--secondary)', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
@@ -152,12 +170,24 @@ const StudentProfile = () => {
               </div>
             </div>
 
-            {/* Actions */}
+            {/* Hero Actions */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                <button className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1rem' }}>
                   <Share2 size={18} /> Share Profile
                </button>
-               <button className="glass" style={{ padding: '1rem 2rem', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+               <button className="glass" style={{ 
+                 padding: '1rem 2rem', 
+                 borderRadius: '12px', 
+                 background: 'rgba(255,255,255,0.05)', 
+                 color: '#fff', 
+                 border: '1px solid rgba(255,255,255,0.1)',
+                 fontWeight: '600',
+                 cursor: 'pointer',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 gap: '0.5rem'
+               }}>
                   <Edit3 size={18} /> Edit Profile
                </button>
             </div>
@@ -166,7 +196,7 @@ const StudentProfile = () => {
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* Main Content Area - Shifted Up */}
       <div className="container" style={{ marginTop: '-40px', position: 'relative', zIndex: 20 }}>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '2rem' }}>
@@ -174,6 +204,7 @@ const StudentProfile = () => {
           {/* Left Column */}
           <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             
+            {/* Academic Info Card */}
             <div className="glass" style={{ padding: '2rem', borderRadius: '2rem', background: '#fff' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '1.5rem', color: '#0f172a' }}>Academic Status</h3>
               <div style={{ padding: '1.5rem', borderRadius: '1.5rem', background: 'var(--primary)', color: '#fff', marginBottom: '1.5rem', position: 'relative', overflow: 'hidden' }}>
@@ -191,9 +222,19 @@ const StudentProfile = () => {
                     <div style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-main)' }}>{student.department}</div>
                   </div>
                 </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(242, 106, 0, 0.05)', color: 'var(--secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Clock size={18} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Enrollment</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: '600', color: 'var(--text-main)' }}>{student.year}</div>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* Contact Card */}
             <div className="glass" style={{ padding: '2rem', borderRadius: '2rem', background: '#fff' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '1.5rem', color: '#0f172a' }}>Contact Details</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -276,7 +317,7 @@ const StudentProfile = () => {
               )}
             </div>
 
-            {/* Other Profile sections... */}
+            {/* Account Management sections */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                <div className="glass" style={{ padding: '2rem', borderRadius: '2rem', background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', color: '#fff' }}>
                   <Bell size={32} style={{ marginBottom: '1.5rem', color: 'var(--secondary)' }} />
