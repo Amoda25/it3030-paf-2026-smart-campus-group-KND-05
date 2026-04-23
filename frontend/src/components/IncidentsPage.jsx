@@ -47,9 +47,9 @@ const IncidentsPage = () => {
   // Reporting Form State
   const [formData, setFormData] = useState({
     fullName: '',
+    faculty: 'Select faculty',
     email: '',
     contactNumber: '',
-    faculty: 'Select faculty',
     preferredTime: '',
     issueTitle: '',
     category: 'Select category',
@@ -69,7 +69,6 @@ const IncidentsPage = () => {
   const fetchIncidents = async () => {
     setLoading(true);
     try {
-      // Trying both common ports to be safe
       const response = await fetch('http://localhost:8081/api/tickets');
       const data = await response.json();
       setIncidents(data);
@@ -96,8 +95,16 @@ const IncidentsPage = () => {
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.issueTitle.trim()) newErrors.issueTitle = "Issue title is required";
     if (formData.category === 'Select category') newErrors.category = "Please select a category";
+    if (formData.faculty === 'Select faculty') newErrors.faculty = "Please select your faculty";
     if (!formData.location || !formData.location.trim()) newErrors.location = "Location is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
+
+    if (formData.contactNumber) {
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.contactNumber)) {
+        newErrors.contactNumber = "Phone number must be exactly 10 digits";
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -106,8 +113,29 @@ const IncidentsPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error when typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
+    }
+    
+    // Live validation
+    let fieldError = null;
+    if (name === 'contactNumber' && value.trim()) {
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(value)) fieldError = "Phone number must be exactly 10 digits";
+    }
+    if (name === 'issueTitle' && value.trim() && value.length < 5) {
+      fieldError = "Title should be at least 5 characters";
+    }
+    if (name === 'description' && value.trim() && value.length < 10) {
+      fieldError = "Please provide more details (min 10 chars)";
+    }
+    if (name === 'category' && value === 'Select category') fieldError = "Please select a category";
+    if (name === 'faculty' && value === 'Select faculty') fieldError = "Please select your faculty";
+
+    if (fieldError) {
+      setErrors(prev => ({ ...prev, [name]: fieldError }));
     }
   };
 
@@ -143,6 +171,23 @@ const IncidentsPage = () => {
     });
   };
 
+  const handleReset = (e) => {
+    if (e) e.preventDefault();
+    setFormData({
+      fullName: '',
+      faculty: 'Select faculty',
+      email: '',
+      contactNumber: '',
+      preferredTime: '',
+      issueTitle: '',
+      category: 'Select category',
+      location: '',
+      description: ''
+    });
+    setImages([]);
+    setErrors({});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -168,8 +213,7 @@ const IncidentsPage = () => {
         setSuccessMsg('Ticket submitted successfully!');
         
         // Reset form
-        setFormData({ fullName: '', email: '', contactNumber: '', preferredTime: '', issueTitle: '', category: 'Select category', location: '', description: '' });
-        setImages([]);
+        handleReset();
         fetchIncidents();
         
         setTimeout(() => {
@@ -177,6 +221,8 @@ const IncidentsPage = () => {
           setIsSubmitted(false);
           setActiveView('tickets');
         }, 5000);
+      } else {
+        throw new Error('Server responded with an error');
       }
     } catch (error) {
       console.error('Error reporting incident:', error);
@@ -284,7 +330,7 @@ const IncidentsPage = () => {
                    <div key={incident.id} className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', background: '#fff', padding: '2rem', borderTop: `6px solid ${style.text}` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
                          <div style={{ padding: '6px 12px', borderRadius: '8px', background: style.bg, color: style.text, fontSize: '0.7rem', fontWeight: '900' }}>{incident.priority || 'MEDIUM'} PRIORITY</div>
-                         <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)' }}>OPEN</span>
+                         <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)' }}>{incident.status || 'OPEN'}</span>
                       </div>
                       <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '0.5rem', color: '#0f172a' }}>{incident.issueTitle || 'Unnamed Issue'}</h3>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
@@ -295,6 +341,10 @@ const IncidentsPage = () => {
                          <div className="flex flex-col">
                             <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>REPORTER</span>
                             <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{incident.fullName}</span>
+                         </div>
+                         <div className="flex flex-col text-right">
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>FACULTY</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{incident.faculty || 'N/A'}</span>
                          </div>
                       </div>
                    </div>
@@ -314,15 +364,40 @@ const IncidentsPage = () => {
                         <div className="flex flex-col gap-2">
                            <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>FULL NAME</label>
                            <input type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.fullName ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                           {errors.fullName && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.fullName}</span>}
                         </div>
+                        <div className="flex flex-col gap-2">
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>FACULTY</label>
+                           <div style={{ position: 'relative' }}>
+                             <select name="faculty" value={formData.faculty} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.faculty ? '1px solid #ef4444' : '1px solid #e2e8f0', appearance: 'none' }}>
+                                <option>Select faculty</option>
+                                <option>Faculty of Computing</option>
+                                <option>Faculty of Business</option>
+                                <option>Faculty of Engineering</option>
+                                <option>Faculty of Humanities & Sciences</option>
+                                <option>Faculty of Graduate Studies</option>
+                             </select>
+                             <ChevronDown size={16} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5 }} />
+                           </div>
+                           {errors.faculty && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.faculty}</span>}
+                        </div>
+                     </div>
+                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div className="flex flex-col gap-2">
                            <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>EMAIL ADDRESS</label>
                            <input type="email" name="email" value={formData.email} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.email ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                           {errors.email && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.email}</span>}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>CONTACT NUMBER</label>
+                           <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleInputChange} placeholder="10 Digits" style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.contactNumber ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                           {errors.contactNumber && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.contactNumber}</span>}
                         </div>
                      </div>
                      <div className="flex flex-col gap-2">
                         <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>ISSUE TITLE</label>
                         <input type="text" name="issueTitle" value={formData.issueTitle} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.issueTitle ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                        {errors.issueTitle && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.issueTitle}</span>}
                      </div>
                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div className="flex flex-col gap-2">
@@ -334,19 +409,18 @@ const IncidentsPage = () => {
                               <option>Network Issue</option>
                               <option>Other</option>
                            </select>
+                           {errors.category && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.category}</span>}
                         </div>
                         <div className="flex flex-col gap-2">
-                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>PRIORITY</label>
-                           <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                              <option value="LOW">LOW</option>
-                              <option value="MEDIUM">MEDIUM</option>
-                              <option value="HIGH">HIGH</option>
-                           </select>
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>LOCATION</label>
+                           <input type="text" name="location" value={formData.location} onChange={handleInputChange} placeholder="Ex: Lab 02, Block A" style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.location ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                           {errors.location && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.location}</span>}
                         </div>
                      </div>
                      <div className="flex flex-col gap-2">
                         <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>INCIDENT DESCRIPTION</label>
                         <textarea name="description" value={formData.description} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.description ? '1px solid #ef4444' : '1px solid #e2e8f0', minHeight: '120px' }} />
+                        {errors.description && <span style={{ color: '#ef4444', fontSize: '0.7rem', fontWeight: '700' }}>{errors.description}</span>}
                      </div>
                      
                      <div className="flex flex-col gap-3">
@@ -376,6 +450,14 @@ const IncidentsPage = () => {
                   <div className="glass" style={{ padding: '2rem', borderRadius: '2rem', background: '#0f172a', color: '#fff' }}>
                      <h4 style={{ color: '#f59e0b', fontWeight: '800', marginBottom: '1.5rem' }}>RESPONSE PROTOCOL</h4>
                      <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.6 }}>Critical tickets are dispatched immediately to on-site technicians.</p>
+                     <div style={{ marginTop: '2rem' }}>
+                       <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6, display: 'block', marginBottom: '0.5rem' }}>INITIAL PRIORITY</label>
+                       <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }}>
+                          <option value="LOW" style={{ color: '#000' }}>LOW</option>
+                          <option value="MEDIUM" style={{ color: '#000' }}>MEDIUM</option>
+                          <option value="HIGH" style={{ color: '#000' }}>HIGH</option>
+                       </select>
+                     </div>
                   </div>
                </div>
             </div>
