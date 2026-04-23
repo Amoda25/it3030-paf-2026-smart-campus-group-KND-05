@@ -1,83 +1,103 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  ArrowRight, 
   Wrench, 
-  ShieldAlert, 
-  Cpu, 
+  AlertTriangle, 
+  AlertCircle,
   Clock, 
-  User, 
-  Mail, 
-  Phone, 
-  FileText, 
+  CheckCircle2, 
+  XCircle, 
+  Info, 
+  PlusCircle, 
+  Activity, 
+  LayoutGrid, 
+  ClipboardList, 
+  TrendingUp, 
+  Search, 
   MapPin, 
-  Layers,
+  Users, 
+  ChevronRight, 
+  ShieldCheck, 
+  Zap,
+  Filter,
+  MoreVertical,
+  ArrowUpRight,
+  History,
   UploadCloud,
   ChevronDown,
   Send,
   RotateCcw,
-  Info,
-  CheckCircle2,
   X
 } from 'lucide-react';
 
 const IncidentsPage = () => {
   const navigate = useNavigate();
-  const formRef = useRef(null);
+  const [activeView, setActiveView] = useState('overview'); // 'overview', 'tickets', 'report'
+  const [incidents, setIncidents] = useState([]);
+  const [facilities, setFacilities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Image Upload Refs & State
   const fileInputRef = useRef(null);
+  const [images, setImages] = useState([]); // {file, previewUrl}
   const [priority, setPriority] = useState('MEDIUM');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedTicket, setSubmittedTicket] = useState(null);
-  const [errors, setErrors] = useState({});
-  const [images, setImages] = useState([]); // {file, previewUrl}
+
+  // Reporting Form State
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     contactNumber: '',
+    faculty: 'Select faculty',
     preferredTime: '',
     issueTitle: '',
     category: 'Select category',
     location: '',
     description: ''
   });
+  
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errors, setErrors] = useState({});
 
-  const scrollToForm = () => {
-    formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => {
+    fetchIncidents();
+    fetchFacilities();
+  }, []);
+
+  const fetchIncidents = async () => {
+    setLoading(true);
+    try {
+      // Trying both common ports to be safe
+      const response = await fetch('http://localhost:8081/api/tickets');
+      const data = await response.json();
+      setIncidents(data);
+    } catch (error) {
+      console.error('Error fetching incidents:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFacilities = async () => {
+    try {
+      const response = await fetch('http://localhost:8081/api/facilities');
+      const data = await response.json();
+      setFacilities(data);
+    } catch (error) {
+      console.error('Error fetching facilities:', error);
+    }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-    
-    const phoneRegex = /^\d{10}$/;
-    if (!formData.contactNumber.trim()) {
-      newErrors.contactNumber = "Contact number is required";
-    } else if (!phoneRegex.test(formData.contactNumber)) {
-      newErrors.contactNumber = "Phone number must be exactly 10 digits";
-    }
-    
-    if (!formData.issueTitle.trim()) {
-      newErrors.issueTitle = "Issue title is required";
-    } else if (formData.issueTitle.length < 5) {
-      newErrors.issueTitle = "Title should be at least 5 characters";
-    }
-    
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.issueTitle.trim()) newErrors.issueTitle = "Issue title is required";
     if (formData.category === 'Select category') newErrors.category = "Please select a category";
     if (!formData.location || !formData.location.trim()) newErrors.location = "Location is required";
-    
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
-    } else if (formData.description.length < 10) {
-      newErrors.description = "Please provide more details (min 10 chars)";
-    }
+    if (!formData.description.trim()) newErrors.description = "Description is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -86,32 +106,9 @@ const IncidentsPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Live validation for the specific field
-    let fieldError = null;
-    if (name === 'fullName' && !value.trim()) fieldError = "Full name is required";
-    if (name === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!value.trim()) fieldError = "Email is required";
-      else if (!emailRegex.test(value)) fieldError = "Please enter a valid email address";
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
     }
-    if (name === 'contactNumber') {
-      const phoneRegex = /^\d{10}$/;
-      if (!value.trim()) fieldError = "Contact number is required";
-      else if (!phoneRegex.test(value)) fieldError = "Phone number must be exactly 10 digits";
-    }
-    if (name === 'issueTitle') {
-      if (!value.trim()) fieldError = "Issue title is required";
-      else if (value.length < 5) fieldError = "Title should be at least 5 characters";
-    }
-    if (name === 'description') {
-      if (!value.trim()) fieldError = "Description is required";
-      else if (value.length < 10) fieldError = "Please provide more details (min 10 chars)";
-    }
-    if (name === 'category' && value === 'Select category') fieldError = "Please select a category";
-    if (name === 'location' && (!value || !value.trim())) fieldError = "Location is required";
-
-    setErrors(prev => ({ ...prev, [name]: fieldError }));
   };
 
   const handleImageChange = (e) => {
@@ -120,14 +117,11 @@ const IncidentsPage = () => {
       alert("You can only upload a maximum of 3 images.");
       return;
     }
-
     const newImages = files.map(file => ({
       file,
       previewUrl: URL.createObjectURL(file)
     }));
-
     setImages(prev => [...prev, ...newImages]);
-    // Reset file input value to allow the same file to be selected again if removed
     e.target.value = '';
   };
 
@@ -138,27 +132,6 @@ const IncidentsPage = () => {
       updated.splice(index, 1);
       return updated;
     });
-  };
-
-  const handleReset = (e) => {
-    e.preventDefault();
-    setFormData({
-      fullName: '',
-      email: '',
-      contactNumber: '',
-      preferredTime: '',
-      issueTitle: '',
-      category: 'Select category',
-      location: '',
-      description: ''
-    });
-    setPriority('MEDIUM');
-    setIsSubmitted(false);
-    setErrors({});
-    
-    // Clear images
-    images.forEach(img => URL.revokeObjectURL(img.previewUrl));
-    setImages([]);
   };
 
   const fileToBase64 = (file) => {
@@ -172,19 +145,15 @@ const IncidentsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+    if (!validateForm()) return;
+
+    setSubmitting(true);
     try {
       const base64Images = await Promise.all(images.map(img => fileToBase64(img.file)));
-
+      
       const response = await fetch('http://localhost:8081/api/tickets', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           priority: priority,
@@ -192,541 +161,233 @@ const IncidentsPage = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit ticket');
+      if (response.ok) {
+        const savedTicket = await response.json();
+        setSubmittedTicket(savedTicket);
+        setIsSubmitted(true);
+        setSuccessMsg('Ticket submitted successfully!');
+        
+        // Reset form
+        setFormData({ fullName: '', email: '', contactNumber: '', preferredTime: '', issueTitle: '', category: 'Select category', location: '', description: '' });
+        setImages([]);
+        fetchIncidents();
+        
+        setTimeout(() => {
+          setSuccessMsg('');
+          setIsSubmitted(false);
+          setActiveView('tickets');
+        }, 5000);
       }
-
-      const savedTicket = await response.json();
-      
-      const ticketInfo = {
-        id: savedTicket.ticketId,
-        category: savedTicket.category,
-        location: savedTicket.location,
-        submittedAt: new Date(savedTicket.submittedAt).toLocaleString('en-US', { 
-          year: 'numeric', 
-          month: '2-digit', 
-          day: '2-digit', 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          hour12: true 
-        }).replace(/\//g, '-')
-      };
-
-      setSubmittedTicket(ticketInfo);
-      setIsSubmitted(true);
     } catch (error) {
-      console.error('Error submitting ticket:', error);
-      alert('There was an error submitting your ticket. Please try again.');
+      console.error('Error reporting incident:', error);
+      alert('Failed to submit ticket. Please check your backend connection.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
+  const getSeverityStyle = (sev) => {
+    switch (sev) {
+      case 'CRITICAL': case 'HIGH': return { bg: '#fef2f2', text: '#ef4444', border: '#fee2e2' };
+      case 'MEDIUM': return { bg: '#fffbeb', text: '#f59e0b', border: '#fef3c7' };
+      default: return { bg: '#eff6ff', text: '#3b82f6', border: '#dbeafe' };
+    }
+  };
+
+  const sidebarItems = [
+    { id: 'overview', label: 'Status Center', icon: <Activity size={20} /> },
+    { id: 'tickets', label: 'Active Tickets', icon: <Wrench size={20} /> },
+    { id: 'report', label: 'Report Issue', icon: <PlusCircle size={20} /> },
+    { id: 'archive', label: 'System Logs', icon: <History size={20} /> },
+  ];
+
   return (
-    <div className="incidents-page" style={{ background: '#f8fafc', minHeight: '100vh', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-      <style>
-        {`
-          @keyframes slide-in {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-          .btn-hover:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-          }
-          .btn-hover:active {
-            transform: translateY(0);
-          }
-          .input-focus:focus {
-            border-color: #3b82f6 !important;
-            background: #fff !important;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-          }
-        `}
-      </style>      
-
-      {/* Success Modal Pop-up */}
-      {isSubmitted && submittedTicket && (
-        <div 
-          style={{ 
-            position: 'fixed', 
-            inset: 0, 
-            background: 'rgba(15, 23, 42, 0.4)', 
-            backdropFilter: 'blur(8px)',
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            zIndex: 9999,
-            padding: '20px'
-          }}
-        >
-          <div 
-            style={{ 
-              background: '#f0fdf4', 
-              width: '100%',
-              maxWidth: '650px', 
-              borderRadius: '24px', 
-              padding: '2.5rem', 
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
-              position: 'relative',
-              border: '1px solid #dcfce7',
-              animation: 'slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-              margin: 'auto'
-            }}
-          >
-            {/* Dismiss Button */}
-            <button 
-              onClick={() => setIsSubmitted(false)}
-              className="btn-hover"
-              style={{ 
-                position: 'absolute', 
-                top: '2rem', 
-                right: '2rem', 
-                padding: '0.6rem 1.25rem', 
-                borderRadius: '12px', 
-                background: 'white', 
-                border: '1px solid rgba(0,0,0,0.05)', 
-                color: '#0f172a', 
-                fontWeight: '700', 
-                fontSize: '0.9rem',
-                cursor: 'pointer'
-              }}
-            >
-              Dismiss
-            </button>
-
-            <div style={{ maxHeight: '95vh', overflowY: 'visible' }}>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ color: '#059669', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>TICKET SUBMITTED SUCCESSFULLY</div>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#064e3b', marginBottom: '0.5rem', lineHeight: 1.2 }}>Your request has been created successfully.</h2>
-                <p style={{ color: '#065f46', fontSize: '0.95rem', lineHeight: 1.4, maxWidth: '600px', opacity: 0.8 }}>
-                  You can now track the ticket status, assigned technician updates, and resolution from your dashboard.
-                </p>
-              </div>
-
-              {/* Details Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '2rem' }}>
-                <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid #dcfce7', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)' }}>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.2rem' }}>Ticket ID</div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#111827' }}>{submittedTicket.id}</div>
-                </div>
-                <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid #dcfce7', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)' }}>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.2rem' }}>Status</div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#111827' }}>OPEN</div>
-                </div>
-                <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid #dcfce7', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)' }}>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.2rem' }}>Category</div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#111827' }}>{submittedTicket.category}</div>
-                </div>
-                <div style={{ background: 'white', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid #dcfce7', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)' }}>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.2rem' }}>Location</div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#111827' }}>{submittedTicket.location}</div>
-                </div>
-                <div style={{ gridColumn: 'span 2', background: 'white', padding: '0.75rem 1rem', borderRadius: '14px', border: '1px solid #dcfce7', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)' }}>
-                  <div style={{ color: '#6b7280', fontSize: '0.75rem', fontWeight: '600', marginBottom: '0.2rem' }}>Submitted At</div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#111827' }}>{submittedTicket.submittedAt}</div>
-                </div>
-              </div>
-
-              {/* Bottom Buttons - Aligned Left */}
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-start' }}>
-                <button 
-                  onClick={() => navigate('/dashboard')}
-                  className="btn-hover"
-                  style={{ 
-                    background: '#059669', 
-                    color: 'white', 
-                    padding: '0.75rem 1.75rem', 
-                    borderRadius: '12px', 
-                    border: 'none', 
-                    fontWeight: '700', 
-                    fontSize: '0.85rem', 
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.2)',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  View Details
-                </button>
-                <button 
-                  onClick={(e) => { handleReset(e); setIsSubmitted(false); }}
-                  className="btn-hover"
-                  style={{ 
-                    background: 'white', 
-                    color: '#059669', 
-                    padding: '0.75rem 1.75rem', 
-                    borderRadius: '12px', 
-                    border: '1px solid #059669', 
-                    fontWeight: '700', 
-                    fontSize: '0.85rem', 
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  Raise Another
-                </button>
-              </div>
-            </div>
+    <div className="incidents-dashboard" style={{ background: '#f8fafc', minHeight: '100vh', paddingTop: '80px', display: 'flex' }}>
+      {/* Sidebar Navigation */}
+      <aside style={{ width: '280px', height: 'calc(100vh - 80px)', position: 'fixed', left: 0, top: '80px', background: '#fff', borderRight: '1px solid rgba(0,0,0,0.05)', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
+        <div style={{ marginBottom: '2.5rem' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '900', color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.5rem', paddingLeft: '0.75rem', opacity: 0.8, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '4px', height: '14px', background: '#f59e0b', borderRadius: '2px' }}></div>
+            Maintenance HUB
+          </div>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {sidebarItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setActiveView(item.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1rem 1.25rem', borderRadius: '12px', border: 'none',
+                  background: activeView === item.id ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                  color: activeView === item.id ? '#f59e0b' : 'var(--text-muted)',
+                  fontSize: '0.95rem', fontWeight: activeView === item.id ? '700' : '500', cursor: 'pointer', transition: 'all 0.2s ease'
+                }}
+              >
+                {item.icon} {item.label}
+                {activeView === item.id && <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>}
+              </button>
+            ))}
+          </nav>
+        </div>
+        <div style={{ marginTop: 'auto' }}>
+          <div className="glass" style={{ padding: '1.5rem', borderRadius: '1.5rem', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#fff' }}>
+             <AlertTriangle size={24} style={{ marginBottom: '1rem' }} />
+             <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '0.25rem' }}>Critical Response</div>
+             <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Emergency IT/Facility protocols active.</div>
           </div>
         </div>
-      )}
+      </aside>
 
-      {/* Integrated Ticket Card - Centered Rounded Box */}
-      <div style={{ 
-        maxWidth: '1150px', 
-        width: '100%', 
-        background: '#ffffff', 
-        borderRadius: '32px', 
-        display: 'flex', 
-        overflow: 'hidden', 
-        boxShadow: '0 50px 100px -20px rgba(0, 0, 0, 0.08), 0 30px 60px -30px rgba(0, 0, 0, 0.1)',
-        border: '1px solid rgba(0,0,0,0.03)',
-        minHeight: '750px',
-        position: 'relative'
-      }}>
-        
-        {/* Left Sidebar - Information */}
-        <div style={{ 
-          width: '38%', 
-          background: 'linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)', 
-          padding: '4rem 3.5rem', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          position: 'relative',
-          borderRight: '1px solid rgba(0,0,0,0.03)'
-        }}>
-          {/* Badge */}
+      {/* Main Content Area */}
+      <main style={{ flex: 1, marginLeft: '280px', padding: '2.5rem 3rem', minWidth: 0 }}>
+        <header style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: '3rem' }}>
+          <div>
+            <h1 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
+              {activeView === 'overview' && 'Status Center'}
+              {activeView === 'tickets' && 'Operations Command'}
+              {activeView === 'report' && 'Incident Reporting'}
+              {activeView === 'archive' && 'Archived Records'}
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+              Monitor real-time system health and manage maintenance tickets.
+            </p>
+          </div>
+        </header>
 
-          <h1 style={{ 
-            fontSize: '3.5rem', 
-            fontWeight: 800, 
-            lineHeight: 1.1, 
-            letterSpacing: '-0.03em',
-            marginBottom: '1.5rem',
-            color: '#0f172a'
-          }}>
-            Raise a campus <br />
-            maintenance ticket
-          </h1>
-
-          <p style={{ 
-            fontSize: '1.15rem', 
-            color: '#475569', 
-            lineHeight: 1.6, 
-            fontWeight: '500',
-            marginBottom: '4rem'
-          }}>
-            Report projector faults, network issues, classroom damage, electrical problems, and more. 
-            Submit your request with priority, location, contact details, and image evidence.
-          </p>
-
-        </div>
-
-        {/* Right Area - Form */}
-        <div style={{ flex: 1, padding: '4rem', overflowY: 'auto' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-            
-            {/* Your Information Section */}
-            <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#2563eb', marginBottom: '1.5rem' }}>Your Information</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <input 
-                    className="input-focus"
-                    type="text" 
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    placeholder="Full Name" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '1rem 1.25rem', 
-                      borderRadius: '14px', 
-                      border: errors.fullName ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                      background: errors.fullName ? '#fef2f2' : '#f8fafc', 
-                      fontSize: '0.95rem', 
-                      color: '#0f172a', 
-                      transition: 'all 0.2s ease' 
-                    }}
-                  />
-                  {errors.fullName && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.fullName}</span>}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <input 
-                    className="input-focus"
-                    type="email" 
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Email Address" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '1rem 1.25rem', 
-                      borderRadius: '14px', 
-                      border: errors.email ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                      background: errors.email ? '#fef2f2' : '#f8fafc', 
-                      fontSize: '0.95rem', 
-                      color: '#0f172a', 
-                      transition: 'all 0.2s ease' 
-                    }}
-                  />
-                  {errors.email && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.email}</span>}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <input 
-                    className="input-focus"
-                    type="text" 
-                    name="contactNumber"
-                    value={formData.contactNumber}
-                    onChange={handleInputChange}
-                    placeholder="Contact Number (10 digits)" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '1rem 1.25rem', 
-                      borderRadius: '14px', 
-                      border: errors.contactNumber ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                      background: errors.contactNumber ? '#fef2f2' : '#f8fafc', 
-                      fontSize: '0.95rem', 
-                      color: '#0f172a', 
-                      transition: 'all 0.2s ease' 
-                    }}
-                  />
-                  {errors.contactNumber && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.contactNumber}</span>}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <input 
-                    className="input-focus"
-                    type="text" 
-                    name="preferredTime"
-                    value={formData.preferredTime}
-                    onChange={handleInputChange}
-                    placeholder="Preferred Contact Time (Ex: AM/PM)" 
-                    style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a', transition: 'all 0.2s ease' }}
-                  />
-                </div>
+        <div className="animate-fade-in">
+          {activeView === 'overview' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+                {[
+                  { label: 'Active Tickets', value: incidents.length, icon: <AlertCircle style={{ color: '#f59e0b' }} />, trend: 'In system', gradient: 'linear-gradient(135deg, #fff 0%, #fffbeb 100%)' },
+                  { label: 'High Priority', value: incidents.filter(i => i.priority === 'HIGH' || i.priority === 'CRITICAL').length, icon: <Zap style={{ color: '#ef4444' }} />, trend: 'Immediate Action', gradient: 'linear-gradient(135deg, #fff 0%, #fef2f2 100%)' },
+                  { label: 'Campus Health', value: '98.4%', icon: <Activity style={{ color: '#3b82f6' }} />, trend: 'Optimal', gradient: 'linear-gradient(135deg, #fff 0%, #eff6ff 100%)' },
+                  { label: 'Avg Response', value: '45m', icon: <Clock style={{ color: '#10b981' }} />, trend: 'SLA Met', gradient: 'linear-gradient(135deg, #fff 0%, #ecfdf5 100%)' },
+                ].map((stat, i) => (
+                  <div key={i} className="glass card-hover" style={{ padding: '2rem', borderRadius: '2rem', background: stat.gradient, border: '1px solid rgba(0,0,0,0.03)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
+                       <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>{stat.icon}</div>
+                       <div style={{ padding: '4px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.8)', fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)' }}>{stat.trend}</div>
+                    </div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.25rem', color: '#0f172a' }}>{stat.value}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>{stat.label}</div>
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Issue Details Section */}
-            <div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#2563eb', marginBottom: '1.5rem' }}>Issue Details</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <input 
-                    className="input-focus"
-                    type="text" 
-                    name="issueTitle"
-                    value={formData.issueTitle}
-                    onChange={handleInputChange}
-                    placeholder="Issue Title (Ex: Projector issue)" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '1rem 1.25rem', 
-                      borderRadius: '14px', 
-                      border: errors.issueTitle ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                      background: errors.issueTitle ? '#fef2f2' : '#f8fafc', 
-                      fontSize: '0.95rem', 
-                      color: '#0f172a', 
-                      transition: 'all 0.2s ease' 
-                    }}
-                  />
-                  {errors.issueTitle && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.issueTitle}</span>}
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <div style={{ position: 'relative' }}>
-                      <select 
-                        name="category"
-                        value={formData.category}
-                        onChange={handleInputChange}
-                        style={{ 
-                          width: '100%', 
-                          padding: '1rem 1.25rem', 
-                          borderRadius: '14px', 
-                          border: errors.category ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                          background: errors.category ? '#fef2f2' : '#f8fafc', 
-                          fontSize: '0.95rem', 
-                          color: '#0f172a', 
-                          appearance: 'none', 
-                          cursor: 'pointer' 
-                        }}
-                      >
-                        <option>Select category</option>
-                        <option>Equipment Fault</option>
-                        <option>Facility Damage</option>
-                        <option>Network Issue</option>
-                        <option>Other</option>
-                      </select>
-                      <ChevronDown size={18} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
-                    </div>
-                    {errors.category && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600', paddingLeft: '0.2rem' }}>{errors.category}</span>}
-                  </div>
+          {activeView === 'tickets' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
+               {incidents.map(incident => {
+                 const style = getSeverityStyle(incident.priority);
+                 return (
+                   <div key={incident.id} className="glass card-hover" style={{ borderRadius: '1.5rem', overflow: 'hidden', background: '#fff', padding: '2rem', borderTop: `6px solid ${style.text}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1.5rem' }}>
+                         <div style={{ padding: '6px 12px', borderRadius: '8px', background: style.bg, color: style.text, fontSize: '0.7rem', fontWeight: '900' }}>{incident.priority || 'MEDIUM'} PRIORITY</div>
+                         <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)' }}>OPEN</span>
+                      </div>
+                      <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '0.5rem', color: '#0f172a' }}>{incident.issueTitle || 'Unnamed Issue'}</h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                        <MapPin size={14} /> {incident.location}
+                      </div>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '2rem', lineHeight: 1.6 }}>{incident.description}</p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
+                         <div className="flex flex-col">
+                            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>REPORTER</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{incident.fullName}</span>
+                         </div>
+                      </div>
+                   </div>
+                 );
+               })}
+            </div>
+          )}
+
+          {activeView === 'report' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '3rem' }}>
+               <div className="glass" style={{ borderRadius: '2rem', background: '#fff', padding: '2.5rem' }}>
+                  <h3 style={{ fontSize: '1.6rem', fontWeight: '800', marginBottom: '0.5rem' }}>Incident Deployment</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2.5rem' }}>Report a technical discrepancy to the maintenance unit.</p>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <input 
-                      className="input-focus"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder="Select location"
-                      style={{ 
-                        width: '100%', 
-                        padding: '1rem 1.25rem', 
-                        borderRadius: '14px', 
-                        border: errors.location ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                        background: errors.location ? '#fef2f2' : '#f8fafc', 
-                        fontSize: '0.95rem', 
-                        color: '#0f172a', 
-                        transition: 'all 0.2s ease' 
-                      }}
-                    />
-                    {errors.location && <span style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: '600', paddingLeft: '0.2rem' }}>{errors.location}</span>}
+                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        <div className="flex flex-col gap-2">
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>FULL NAME</label>
+                           <input type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.fullName ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>EMAIL ADDRESS</label>
+                           <input type="email" name="email" value={formData.email} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.email ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                        </div>
+                     </div>
+                     <div className="flex flex-col gap-2">
+                        <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>ISSUE TITLE</label>
+                        <input type="text" name="issueTitle" value={formData.issueTitle} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.issueTitle ? '1px solid #ef4444' : '1px solid #e2e8f0' }} />
+                     </div>
+                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        <div className="flex flex-col gap-2">
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>CATEGORY</label>
+                           <select name="category" value={formData.category} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.category ? '1px solid #ef4444' : '1px solid #e2e8f0' }}>
+                              <option>Select category</option>
+                              <option>Equipment Fault</option>
+                              <option>Facility Damage</option>
+                              <option>Network Issue</option>
+                              <option>Other</option>
+                           </select>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                           <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>PRIORITY</label>
+                           <select value={priority} onChange={(e) => setPriority(e.target.value)} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                              <option value="LOW">LOW</option>
+                              <option value="MEDIUM">MEDIUM</option>
+                              <option value="HIGH">HIGH</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div className="flex flex-col gap-2">
+                        <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>INCIDENT DESCRIPTION</label>
+                        <textarea name="description" value={formData.description} onChange={handleInputChange} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#f8fafc', border: errors.description ? '1px solid #ef4444' : '1px solid #e2e8f0', minHeight: '120px' }} />
+                     </div>
+                     
+                     <div className="flex flex-col gap-3">
+                        <label style={{ fontSize: '0.75rem', fontWeight: '800', opacity: 0.6 }}>ATTACH EVIDENCE (MAX 3 IMAGES)</label>
+                        <div onClick={() => images.length < 3 && fileInputRef.current?.click()} style={{ border: '2px dashed #e2e8f0', borderRadius: '16px', padding: '1.5rem', textAlign: 'center', cursor: 'pointer' }}>
+                           <UploadCloud size={32} style={{ color: '#f59e0b', margin: '0 auto 0.5rem' }} />
+                           <div style={{ fontSize: '0.85rem', fontWeight: '700' }}>{images.length < 3 ? 'Click to upload images' : 'Limit reached'}</div>
+                        </div>
+                        <input type="file" ref={fileInputRef} onChange={handleImageChange} style={{ display: 'none' }} multiple accept="image/*" />
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                           {images.map((img, i) => (
+                             <div key={i} style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden' }}>
+                               <img src={img.previewUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                               <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: '#fff', border: 'none' }}><X size={12} /></button>
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+
+                     <button type="submit" disabled={submitting} style={{ width: '100%', padding: '1.25rem', borderRadius: '16px', background: '#f59e0b', color: '#fff', fontWeight: '800', border: 'none', marginTop: '1rem' }}>
+                        {submitting ? 'Submitting...' : 'Deploy Ticket'}
+                     </button>
+                     {successMsg && <div style={{ color: '#10b981', fontWeight: '700', textAlign: 'center', marginTop: '1rem' }}>{successMsg}</div>}
+                  </form>
+               </div>
+               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  <div className="glass" style={{ padding: '2rem', borderRadius: '2rem', background: '#0f172a', color: '#fff' }}>
+                     <h4 style={{ color: '#f59e0b', fontWeight: '800', marginBottom: '1.5rem' }}>RESPONSE PROTOCOL</h4>
+                     <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.6 }}>Critical tickets are dispatched immediately to on-site technicians.</p>
                   </div>
-
-                  <div style={{ position: 'relative' }}>
-                    <select 
-                      value={priority}
-                      onChange={(e) => setPriority(e.target.value)}
-                      style={{ width: '100%', padding: '1rem 1.25rem', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.08)', background: '#f8fafc', fontSize: '0.95rem', color: '#0f172a', appearance: 'none', cursor: 'pointer' }}
-                    >
-                      <option value="LOW">LOW Priority</option>
-                      <option value="MEDIUM">MEDIUM Priority</option>
-                      <option value="HIGH">HIGH Priority</option>
-                    </select>
-                    <ChevronDown size={18} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <textarea 
-                    className="input-focus"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="Detailed Description of the incident" 
-                    style={{ 
-                      width: '100%', 
-                      padding: '1.25rem', 
-                      borderRadius: '14px', 
-                      border: errors.description ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
-                      background: errors.description ? '#fef2f2' : '#f8fafc', 
-                      fontSize: '0.95rem', 
-                      color: '#0f172a', 
-                      minHeight: '120px', 
-                      resize: 'vertical' 
-                    }}
-                  />
-                  {errors.description && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.description}</span>}
-                </div>
-              </div>
+               </div>
             </div>
-
-            {/* Upload Area */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <input 
-                type="file" 
-                multiple 
-                accept="image/*" 
-                ref={fileInputRef} 
-                onChange={handleImageChange} 
-                style={{ display: 'none' }} 
-              />
-              
-              {/* Image Previews */}
-              {images.length > 0 && (
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  {images.map((img, index) => (
-                    <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '12px', overflow: 'hidden', border: '2px solid #e2e8f0' }}>
-                      <img src={img.previewUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <button 
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div 
-                onClick={() => images.length < 3 && fileInputRef.current?.click()}
-                style={{ 
-                  border: '2px dashed rgba(59, 130, 246, 0.2)', 
-                  borderRadius: '20px', 
-                  padding: '2rem', 
-                  textAlign: 'center',
-                  background: 'rgba(59, 130, 246, 0.02)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  cursor: images.length < 3 ? 'pointer' : 'not-allowed',
-                  opacity: images.length < 3 ? 1 : 0.6
-                }}
-              >
-                <UploadCloud size={32} style={{ color: '#2563eb' }} />
-                <div style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0f172a' }}>
-                  {images.length < 3 ? 'Upload Images (Max 3)' : 'Maximum Images Uploaded'}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                  {images.length}/3 images selected
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-              <button 
-                type="button" 
-                onClick={handleReset}
-                className="btn-hover"
-                style={{ 
-                  flex: 1, 
-                  padding: '1.1rem', 
-                  borderRadius: '16px', 
-                  border: '1px solid rgba(0,0,0,0.1)', 
-                  background: 'white', 
-                  color: '#0f172a', 
-                  fontWeight: '700', 
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <RotateCcw size={18} />
-                Reset Form
-              </button>
-              <button 
-                type="submit" 
-                className="btn-hover"
-                style={{ 
-                  flex: 2, 
-                  padding: '1.1rem', 
-                  borderRadius: '16px', 
-                  border: 'none', 
-                  background: '#2563eb', 
-                  color: 'white', 
-                  fontWeight: '700', 
-                  cursor: 'pointer',
-                  boxShadow: '0 10px 25px rgba(37, 99, 235, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <Send size={18} />
-                Submit Maintenance Ticket
-              </button>
-            </div>
-
-          </form>
+          )}
         </div>
-
-      </div>
+      </main>
+      <style>{`
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      `}</style>
     </div>
   );
 };

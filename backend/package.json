@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Smart Campus Spring Boot Backend Wrapper",
   "scripts": {
-    "dev": "./mvnw spring-boot:run",
-    "build": "./mvnw clean package"
+    "dev": "mvnw spring-boot:run",
+    "build": "mvnw clean package"
   },
   "author": "",
   "license": "ISC"
