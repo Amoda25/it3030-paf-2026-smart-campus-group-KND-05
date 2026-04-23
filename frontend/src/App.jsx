@@ -15,6 +15,7 @@ import MyBookings from './components/MyBookings';
 import IncidentsPage from './components/IncidentsPage';
 import IncidentManagement from './components/IncidentManagement';
 import AdminPage from './components/AdminPage';
+import StudentProfile from './components/StudentProfile';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/incidents" element={<IncidentsPage />} />
             <Route path="/incident-management" element={<IncidentManagement />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/profile" element={<StudentProfile />} />
           </Routes>
         </main>
         <Footer />

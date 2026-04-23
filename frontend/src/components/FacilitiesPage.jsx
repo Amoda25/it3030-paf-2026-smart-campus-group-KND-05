@@ -60,7 +60,7 @@ const FacilitiesPage = () => {
   const fetchFacilities = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/facilities');
+      const response = await fetch('http://localhost:8081/api/facilities');
       const data = await response.json();
       setFacilities(data);
     } catch (error) {
@@ -74,7 +74,7 @@ const FacilitiesPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const response = await fetch('http://localhost:8080/api/facilities', {
+      const response = await fetch('http://localhost:8081/api/facilities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -87,13 +87,27 @@ const FacilitiesPage = () => {
           setSuccessMsg('');
           setActiveView('inventory');
         }, 2000);
+        } else {
+          let errorMessage = 'Failed to register facility';
+          try {
+            const errorText = await response.text();
+            if (errorText) {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.message || errorMessage;
+            }
+          } catch (e) {
+            // Not JSON or empty body, keep default message
+          }
+          throw new Error(errorMessage);
+        }
+      } catch (error) {
+        console.error('Error adding facility:', error);
+        setSuccessMsg(`Error: ${error.message}`);
+        setTimeout(() => setSuccessMsg(''), 5000);
+      } finally {
+        setSubmitting(false);
       }
-    } catch (error) {
-      console.error('Error adding facility:', error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    };
 
   const categories = ['All', 'Lecture Hall', 'Lab', 'Meeting Room', 'Studios', 'Equipment'];
 
