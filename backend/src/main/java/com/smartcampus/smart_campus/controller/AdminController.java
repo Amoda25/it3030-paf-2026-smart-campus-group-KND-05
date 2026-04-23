@@ -1,6 +1,7 @@
 package com.smartcampus.smart_campus.controller;
 
 import com.smartcampus.smart_campus.model.User;
+import com.smartcampus.smart_campus.model.Role;
 import com.smartcampus.smart_campus.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AdminController {
         stats.put("totalFacilities", facilityRepository.count());
         stats.put("activeBookings", bookingRepository.findAll().size()); // Simplified
         stats.put("openIncidents", incidentRepository.findByStatus("OPEN").size());
-        stats.put("activeTechnicians", userRepository.findAll().stream().filter(u -> "TECHNICIAN".equals(u.getRole())).count());
+        stats.put("activeTechnicians", userRepository.findAll().stream().filter(u -> Role.TECHNICIAN.equals(u.getRole())).count());
         return ResponseEntity.ok(stats);
     }
 
@@ -40,7 +41,7 @@ public class AdminController {
     @PatchMapping("/users/{id}/role")
     public ResponseEntity<User> updateUserRole(@PathVariable String id, @RequestParam String role) {
         return userRepository.findById(id).map(user -> {
-            user.setRole(role);
+            user.setRole(Role.valueOf(role.toUpperCase()));
             return ResponseEntity.ok(userRepository.save(user));
         }).orElse(ResponseEntity.notFound().build());
     }
