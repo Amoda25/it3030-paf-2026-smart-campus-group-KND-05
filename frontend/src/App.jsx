@@ -17,6 +17,7 @@ import IncidentsPage from './components/IncidentsPage';
 import IncidentManagement from './components/IncidentManagement';
 import AdminPage from './components/AdminPage';
 import StudentProfile from './components/StudentProfile';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
   return (
@@ -38,8 +39,16 @@ function App() {
             <Route path="/book" element={<BookingForm />} />
             <Route path="/incidents" element={<IncidentsPage />} />
             <Route path="/incident-management" element={<IncidentManagement />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/profile" element={<StudentProfile />} />
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <StudentProfile />
+              </ProtectedRoute>
+            } />
           </Routes>
         </main>
         <Footer />
