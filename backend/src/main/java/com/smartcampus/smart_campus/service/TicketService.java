@@ -31,4 +31,55 @@ public class TicketService {
         
         return ticketRepository.save(ticket);
     }
+
+    public Ticket updateTicket(String ticketId, Ticket updatedTicket) {
+        Ticket ticket = ticketRepository.findByTicketId(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found with ID: " + ticketId));
+        
+        String oldStatus = ticket.getStatus();
+        boolean changed = false;
+
+        if (updatedTicket.getStatus() != null && !updatedTicket.getStatus().equals(oldStatus)) {
+            ticket.setStatus(updatedTicket.getStatus());
+            
+            // Auto-add a system comment
+            if (ticket.getComments() == null) ticket.setComments(new java.util.ArrayList<>());
+            ticket.getComments().add(new Ticket.Comment("SYSTEM", "Status updated to " + updatedTicket.getStatus(), LocalDateTime.now()));
+            changed = true;
+        }
+        
+        if (updatedTicket.getTechnician() != null) {
+            ticket.setTechnician(updatedTicket.getTechnician());
+            changed = true;
+        }
+        
+        if (updatedTicket.getPriority() != null) {
+            ticket.setPriority(updatedTicket.getPriority());
+            changed = true;
+        }
+        
+        if (updatedTicket.getResolutionNote() != null) {
+            ticket.setResolutionNote(updatedTicket.getResolutionNote());
+            changed = true;
+        }
+
+        if (updatedTicket.getRejectionReason() != null) {
+            ticket.setRejectionReason(updatedTicket.getRejectionReason());
+            changed = true;
+        }
+        
+        return ticketRepository.save(ticket);
+    }
+
+    public Ticket addComment(String ticketId, Ticket.Comment comment) {
+        Ticket ticket = ticketRepository.findByTicketId(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found with ID: " + ticketId));
+        
+        if (ticket.getComments() == null) {
+            ticket.setComments(new java.util.ArrayList<>());
+        }
+        
+        comment.setTimestamp(LocalDateTime.now());
+        ticket.getComments().add(comment);
+        
+        return ticketRepository.save(ticket);
+    }
 }
