@@ -10,22 +10,23 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "bookings")
-public class Booking {
+@Document(collection = "incidents")
+public class Incident {
 
     @Id
     private String id;
 
     private String facilityId;
     private String facilityName;
-    private String userId; // User who made the booking
-    private String userName;
+    private String reporterName;
+    
+    private String issueType; // ELECTRICAL, PLUMBING, IT, CLEANING, SECURITY
+    private String severity; // LOW, MEDIUM, HIGH, CRITICAL
+    private String status; // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+    
+    private String description;
+    private String resolutionNotes;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-
-    private String status; // PENDING, APPROVED, REJECTED, CANCELLED
-    private String purpose;
     private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime resolvedAt;
 }
-
