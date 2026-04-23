@@ -29,7 +29,6 @@ const Header = () => {
           <Link to="/courses" className="nav-link" style={{ fontWeight: '600' }}>Courses</Link>
           <Link to="/facilities" className="nav-link" style={{ fontWeight: '600' }}>Facilities</Link>
           <Link to="/incidents" className="nav-link" style={{ fontWeight: '600' }}>Ticket</Link>
-          <Link to="/book" className="nav-link" style={{ fontWeight: '600' }}>Book Resource</Link>
           <Link to="/facilities-dashboard" className="nav-link" style={{ fontWeight: '600' }}>Facilities & Assets</Link>
           <Link to="/dashboard" className="nav-link" style={{ fontWeight: '600' }}>Dashboard</Link>
           <Link to="/profile" className="nav-link" style={{ fontWeight: '600' }}>Profile</Link>
@@ -66,7 +65,6 @@ const Header = () => {
             <Link to="/courses" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Courses</Link>
             <Link to="/facilities" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Facilities</Link>
             <Link to="/incidents" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Ticket</Link>
-            <Link to="/book" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Book Resource</Link>
             <Link to="/facilities-dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Facilities & Assets</Link>
             <Link to="/dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
             <Link to="/profile" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Profile</Link>
