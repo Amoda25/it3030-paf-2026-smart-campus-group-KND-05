@@ -161,6 +161,15 @@ const IncidentsPage = () => {
     setImages([]);
   };
 
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -169,6 +178,8 @@ const IncidentsPage = () => {
     }
     
     try {
+      const base64Images = await Promise.all(images.map(img => fileToBase64(img.file)));
+
       const response = await fetch('http://localhost:8081/api/tickets', {
         method: 'POST',
         headers: {
@@ -176,7 +187,8 @@ const IncidentsPage = () => {
         },
         body: JSON.stringify({
           ...formData,
-          priority: priority
+          priority: priority,
+          images: base64Images
         }),
       });
 

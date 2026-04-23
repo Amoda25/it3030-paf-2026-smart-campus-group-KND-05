@@ -32,6 +32,7 @@ public class Ticket {
     private String resolutionNote;
     private String rejectionReason;
     private List<Comment> comments;
+    private List<String> images;
 
     @Data
     @NoArgsConstructor
