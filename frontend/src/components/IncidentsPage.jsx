@@ -34,6 +34,7 @@ const IncidentsPage = () => {
     fullName: '',
     email: '',
     contactNumber: '',
+    faculty: 'Select faculty',
     preferredTime: '',
     issueTitle: '',
     category: 'Select category',
@@ -63,6 +64,8 @@ const IncidentsPage = () => {
     } else if (!phoneRegex.test(formData.contactNumber)) {
       newErrors.contactNumber = "Phone number must be exactly 10 digits";
     }
+    
+    if (formData.faculty === 'Select faculty') newErrors.faculty = "Please select your faculty";
     
     if (!formData.issueTitle.trim()) {
       newErrors.issueTitle = "Issue title is required";
@@ -100,6 +103,7 @@ const IncidentsPage = () => {
       if (!value.trim()) fieldError = "Contact number is required";
       else if (!phoneRegex.test(value)) fieldError = "Phone number must be exactly 10 digits";
     }
+    if (name === 'faculty' && value === 'Select faculty') fieldError = "Please select your faculty";
     if (name === 'issueTitle') {
       if (!value.trim()) fieldError = "Issue title is required";
       else if (value.length < 5) fieldError = "Title should be at least 5 characters";
@@ -146,6 +150,7 @@ const IncidentsPage = () => {
       fullName: '',
       email: '',
       contactNumber: '',
+      faculty: 'Select faculty',
       preferredTime: '',
       issueTitle: '',
       category: 'Select category',
@@ -490,6 +495,37 @@ const IncidentsPage = () => {
                     }}
                   />
                   {errors.contactNumber && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.contactNumber}</span>}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <div style={{ position: 'relative' }}>
+                    <select 
+                      className="input-focus"
+                      name="faculty"
+                      value={formData.faculty}
+                      onChange={handleInputChange}
+                      style={{ 
+                        width: '100%', 
+                        padding: '1rem 1.25rem', 
+                        borderRadius: '14px', 
+                        border: errors.faculty ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
+                        background: errors.faculty ? '#fef2f2' : '#f8fafc', 
+                        fontSize: '0.95rem', 
+                        color: '#0f172a', 
+                        appearance: 'none', 
+                        cursor: 'pointer' 
+                      }}
+                    >
+                      <option>Select faculty</option>
+                      <option>Computing</option>
+                      <option>Business</option>
+                      <option>Engineering</option>
+                      <option>Humanities & Sciences</option>
+                      <option>Architecture</option>
+                      <option>Graduate Studies</option>
+                    </select>
+                    <ChevronDown size={18} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
+                  </div>
+                  {errors.faculty && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.faculty}</span>}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <input 

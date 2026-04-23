@@ -668,6 +668,7 @@ const IncidentManagement = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #f1f5f9', borderRadius: '16px', overflow: 'hidden' }}>
                     {[
                       { label: 'Student', value: selectedTicket.fullName },
+                      { label: 'Faculty', value: selectedTicket.faculty || 'Not Specified' },
                       { label: 'Contact', value: selectedTicket.contactNumber },
                       { label: 'Preferred Time', value: selectedTicket.preferredTime },
                       { label: 'Category', value: selectedTicket.category },
