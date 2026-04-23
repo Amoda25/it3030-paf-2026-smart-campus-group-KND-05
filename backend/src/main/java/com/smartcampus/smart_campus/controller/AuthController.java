@@ -2,6 +2,7 @@ package com.smartcampus.smart_campus.controller;
 
 import com.smartcampus.smart_campus.dto.ApiResponse;
 import com.smartcampus.smart_campus.dto.SignupRequest;
+import com.smartcampus.smart_campus.dto.LoginRequest;
 import com.smartcampus.smart_campus.model.User;
 import com.smartcampus.smart_campus.service.UserService;
 import jakarta.validation.Valid;
@@ -32,6 +33,28 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse(false, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Something went wrong. Please try again."));
+        }
+    }
+
+    /**
+     * POST /api/auth/login
+     * Authenticates a user and returns a success response.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            User user = userService.authenticateUser(request);
+            return ResponseEntity
+                    .ok()
+                    .body(new ApiResponse(true, "Welcome back, " + user.getFullName() + "!"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse(false, e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity

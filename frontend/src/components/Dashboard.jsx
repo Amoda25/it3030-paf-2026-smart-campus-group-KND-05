@@ -20,10 +20,10 @@ const Dashboard = () => {
     {
       title: "Facilities & Assets",
       description: "Comprehensive catalogue of lecture halls, labs, and specialized equipment management.",
-      icon: <Building2 size={24} className="text-primary" />,
-      link: "/facilities",
-      color: "rgba(59, 130, 246, 0.15)",
-      accent: "#3b82f6",
+      icon: <Building2 size={24} style={{ color: '#8b5cf6' }} />,
+      link: "/facilities-dashboard",
+      color: "rgba(139, 92, 246, 0.15)",
+      accent: "#8b5cf6",
       tag: "Module A"
     },
     {

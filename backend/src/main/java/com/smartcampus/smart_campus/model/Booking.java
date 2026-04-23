@@ -1,30 +1,41 @@
 package com.smartcampus.smart_campus.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-@Document(collection = "bookings")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = "bookings")
 public class Booking {
 
     @Id
     private String id;
 
-    private String fullName;
-    private String sid; // Student/Staff ID
-    private String resourceType;
-    private String resourceName;
-    private LocalDate bookingDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private String purpose;
+    private String facilityId;
+    private String facilityName;
+    private String userId; // User SID
+    private String userName;
+    private String userFaculty;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
     private String status = "PENDING"; // PENDING, APPROVED, REJECTED
+    private String purpose;
+    private int participantsCount;
+    
+    // Special Requirements
+    private boolean projectorNeeded;
+    private boolean microphoneNeeded;
+    private boolean acNeeded;
+    private String seatingArrangement;
+    
+    private String notes;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
+
