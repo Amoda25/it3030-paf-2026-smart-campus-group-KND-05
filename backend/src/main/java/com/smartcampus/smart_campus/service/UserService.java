@@ -1,6 +1,7 @@
 package com.smartcampus.smart_campus.service;
 
 import com.smartcampus.smart_campus.dto.SignupRequest;
+import com.smartcampus.smart_campus.dto.LoginRequest;
 import com.smartcampus.smart_campus.model.User;
 import com.smartcampus.smart_campus.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,19 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
         return userRepository.save(user);
+    }
+
+    /**
+     * Authenticates a user with email and password.
+     */
+    public User authenticateUser(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail().toLowerCase().trim())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        return user;
     }
 }

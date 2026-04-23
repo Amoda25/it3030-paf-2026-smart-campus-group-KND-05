@@ -123,6 +123,7 @@ const FacilitiesPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+
       if (response.ok) {
         alert("🎉 Success! Facility registered correctly in the database.");
         setShowSuccessModal(true);
@@ -136,14 +137,21 @@ const FacilitiesPage = () => {
           imageUrl: '' 
         });
         fetchFacilities();
-        // Keep modal visible longer for user confirmation
         setTimeout(() => {
           setShowSuccessModal(false);
           setActiveView('inventory');
         }, 5000);
       } else {
-        const errorText = await response.text();
-        alert("❌ Failed to register: " + errorText);
+        let errorMessage = 'Failed to register facility';
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        } catch (e) {
+          // ignore
+        }
+        alert("❌ Failed to register: " + errorMessage);
       }
     } catch (error) {
       console.error('Error adding facility:', error);

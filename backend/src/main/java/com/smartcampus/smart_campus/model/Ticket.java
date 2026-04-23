@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(collection = "tickets")
 @Data
@@ -28,4 +29,17 @@ public class Ticket {
     private String status; // OPEN, IN_PROGRESS, RESOLVED
     private LocalDateTime submittedAt;
     private String technician; // Not Assigned or technician name
+    private String resolutionNote;
+    private String rejectionReason;
+    private List<Comment> comments;
+    private List<String> images;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Comment {
+        private String author;
+        private String text;
+        private LocalDateTime timestamp;
+    }
 }

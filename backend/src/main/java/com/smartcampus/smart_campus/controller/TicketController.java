@@ -26,4 +26,16 @@ public class TicketController {
         Ticket savedTicket = ticketService.createTicket(ticket);
         return ResponseEntity.ok(savedTicket);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Ticket> updateTicket(@PathVariable String id, @RequestBody Ticket ticket) {
+        Ticket updatedTicket = ticketService.updateTicket(id, ticket);
+        return ResponseEntity.ok(updatedTicket);
+    }
+
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<Ticket> addComment(@PathVariable String id, @RequestBody Ticket.Comment comment) {
+        Ticket updatedTicket = ticketService.addComment(id, comment);
+        return ResponseEntity.ok(updatedTicket);
+    }
 }
