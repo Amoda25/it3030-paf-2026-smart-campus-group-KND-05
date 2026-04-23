@@ -32,6 +32,7 @@ const IncidentsPage = () => {
   const [images, setImages] = useState([]); // {file, previewUrl}
   const [formData, setFormData] = useState({
     fullName: '',
+    faculty: 'Select faculty',
     email: '',
     contactNumber: '',
     preferredTime: '',
@@ -71,6 +72,7 @@ const IncidentsPage = () => {
     }
     
     if (formData.category === 'Select category') newErrors.category = "Please select a category";
+    if (formData.faculty === 'Select faculty') newErrors.faculty = "Please select your faculty";
     if (!formData.location || !formData.location.trim()) newErrors.location = "Location is required";
     
     if (!formData.description.trim()) {
@@ -109,6 +111,7 @@ const IncidentsPage = () => {
       else if (value.length < 10) fieldError = "Please provide more details (min 10 chars)";
     }
     if (name === 'category' && value === 'Select category') fieldError = "Please select a category";
+    if (name === 'faculty' && value === 'Select faculty') fieldError = "Please select your faculty";
     if (name === 'location' && (!value || !value.trim())) fieldError = "Location is required";
 
     setErrors(prev => ({ ...prev, [name]: fieldError }));
@@ -144,6 +147,7 @@ const IncidentsPage = () => {
     e.preventDefault();
     setFormData({
       fullName: '',
+      faculty: 'Select faculty',
       email: '',
       contactNumber: '',
       preferredTime: '',
@@ -436,6 +440,35 @@ const IncidentsPage = () => {
                     }}
                   />
                   {errors.fullName && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.fullName}</span>}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <div style={{ position: 'relative' }}>
+                    <select 
+                      name="faculty"
+                      value={formData.faculty}
+                      onChange={handleInputChange}
+                      style={{ 
+                        width: '100%', 
+                        padding: '1rem 1.25rem', 
+                        borderRadius: '14px', 
+                        border: errors.faculty ? '1px solid #ef4444' : '1px solid rgba(0,0,0,0.08)', 
+                        background: errors.faculty ? '#fef2f2' : '#f8fafc', 
+                        fontSize: '0.95rem', 
+                        color: '#0f172a', 
+                        appearance: 'none', 
+                        cursor: 'pointer' 
+                      }}
+                    >
+                      <option>Select faculty</option>
+                      <option>Faculty of Computing</option>
+                      <option>Faculty of Business</option>
+                      <option>Faculty of Engineering</option>
+                      <option>Faculty of Humanities & Sciences</option>
+                      <option>Faculty of Graduate Studies</option>
+                    </select>
+                    <ChevronDown size={18} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', pointerEvents: 'none' }} />
+                  </div>
+                  {errors.faculty && <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', paddingLeft: '0.5rem' }}>{errors.faculty}</span>}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <input 

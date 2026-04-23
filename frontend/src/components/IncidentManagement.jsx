@@ -35,13 +35,14 @@ const IncidentManagement = () => {
       
       // Map backend data to frontend format if needed
       const formattedTickets = data.map(ticket => ({
-        id: ticket.ticketId,
-        title: ticket.issueTitle,
-        subtitle: `${ticket.category} • ${ticket.fullName}`,
-        location: ticket.location,
-        priority: ticket.priority,
-        status: ticket.status,
-        technician: ticket.technician
+        id: ticket.ticketId || 'N/A',
+        title: ticket.issueTitle || 'No Title',
+        subtitle: `${ticket.category || 'General'} • ${ticket.fullName || 'Anonymous'}`,
+        faculty: ticket.faculty || 'Not Specified',
+        location: ticket.location || 'Unknown',
+        priority: ticket.priority || 'MEDIUM',
+        status: ticket.status || 'OPEN',
+        technician: ticket.technician || 'Not Assigned'
       }));
       
       setTickets(formattedTickets);
@@ -230,6 +231,7 @@ const IncidentManagement = () => {
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Ticket ID</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Title</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Location</th>
+                <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Faculty</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Priority</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Status</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Technician</th>
@@ -246,9 +248,10 @@ const IncidentManagement = () => {
                   // Search Filtering
                   const searchLower = searchQuery.toLowerCase();
                   const matchesSearch = 
-                    ticket.id.toLowerCase().includes(searchLower) ||
-                    ticket.title.toLowerCase().includes(searchLower) ||
-                    ticket.location.toLowerCase().includes(searchLower);
+                    (ticket.id && ticket.id.toLowerCase().includes(searchLower)) ||
+                    (ticket.title && ticket.title.toLowerCase().includes(searchLower)) ||
+                    (ticket.location && ticket.location.toLowerCase().includes(searchLower)) ||
+                    (ticket.faculty && ticket.faculty.toLowerCase().includes(searchLower));
                   if (!matchesSearch) return false;
 
                   // Status Dropdown Filtering
@@ -264,6 +267,7 @@ const IncidentManagement = () => {
                     <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{ticket.subtitle}</div>
                   </td>
                   <td style={{ padding: '1.5rem', color: '#64748b', fontWeight: '500' }}>{ticket.location}</td>
+                  <td style={{ padding: '1.5rem', color: '#64748b', fontWeight: '600' }}>{ticket.faculty}</td>
                   <td style={{ padding: '1.5rem' }}>
                     <span style={{ 
                       padding: '0.4rem 0.8rem', 
