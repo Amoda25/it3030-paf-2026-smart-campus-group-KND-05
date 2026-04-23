@@ -18,8 +18,8 @@ const Header = () => {
     <header className={`nav-header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container flex justify-between items-center relative" style={{ height: '100%', width: '100%' }}>
         <Link to="/" className="nav-logo flex items-center gap-3">
-          <div className="flex items-center justify-center" style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.1)' }}>
-            <Building2 className="text-primary" size={24} />
+          <div className="flex items-center justify-center" style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(242, 106, 0, 0.1)' }}>
+            <Building2 style={{ color: 'var(--secondary)' }} size={24} />
           </div>
           <span className="gradient-text" style={{ fontSize: '1.5rem', fontWeight: '800' }}>UniHub</span>
         </Link>
@@ -31,7 +31,9 @@ const Header = () => {
           <Link to="/incidents" className="nav-link" style={{ fontWeight: '600' }}>Ticket</Link>
           <Link to="/book" className="nav-link" style={{ fontWeight: '600' }}>Book Resource</Link>
           <Link to="/my-bookings" className="nav-link" style={{ fontWeight: '600' }}>My Bookings</Link>
+          <Link to="/facilities-dashboard" className="nav-link" style={{ fontWeight: '600' }}>Facilities & Assets</Link>
           <Link to="/dashboard" className="nav-link" style={{ fontWeight: '600' }}>Dashboard</Link>
+          <Link to="/profile" className="nav-link" style={{ fontWeight: '600' }}>Profile</Link>
           <Link to="/about" className="nav-link" style={{ fontWeight: '600' }}>About Us</Link>
           <Link to="/contact" className="nav-link" style={{ fontWeight: '600' }}>Contact Us</Link>
         </nav>
@@ -58,7 +60,7 @@ const Header = () => {
       </div>
 
       {/* Mobile Menu Overlay */}
-      <div className={`lg-hidden fixed ${isMobileMenuOpen ? 'flex' : 'hidden'}`} style={{ top: '80px', left: 0, right: 0, padding: '1rem', background: 'rgba(2, 6, 23, 0.95)', backdropFilter: 'blur(20px)', zIndex: 999 }}>
+      <div className={`lg-hidden fixed ${isMobileMenuOpen ? 'flex' : 'hidden'}`} style={{ top: '52px', left: 0, right: 0, padding: '1rem', background: 'rgba(2, 6, 23, 0.95)', backdropFilter: 'blur(20px)', zIndex: 999 }}>
         <div className="glass flex flex-col gap-6" style={{ width: '100%', padding: '2rem', borderRadius: '1.5rem' }}>
           <nav className="flex flex-col gap-4">
             <Link to="/" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
@@ -67,7 +69,9 @@ const Header = () => {
             <Link to="/incidents" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Ticket</Link>
             <Link to="/book" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Book Resource</Link>
             <Link to="/my-bookings" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>My Bookings</Link>
+            <Link to="/facilities-dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Facilities & Assets</Link>
             <Link to="/dashboard" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
+            <Link to="/profile" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Profile</Link>
             <Link to="/about" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
             <Link to="/contact" className="nav-link" style={{ fontSize: '1.1rem' }} onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>
           </nav>

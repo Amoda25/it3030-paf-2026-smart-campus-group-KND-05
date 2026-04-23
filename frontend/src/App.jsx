@@ -7,13 +7,17 @@ import CoursePage from './components/CoursePage';
 import AboutUs from './components/AboutUs';
 import ContactUs from './components/ContactUs';
 import RegisterPage from './components/RegisterPage';
+import LoginPage from './components/LoginPage';
 import FacilitiesPage from './components/FacilitiesPage';
+import UserFacilities from './components/UserFacilities';
 import Dashboard from './components/Dashboard';
 import BookingsPage from './components/BookingsPage';
 import BookingForm from './components/BookingForm';
 import MyBookings from './components/MyBookings';
 import IncidentsPage from './components/IncidentsPage';
+import IncidentManagement from './components/IncidentManagement';
 import AdminPage from './components/AdminPage';
+import StudentProfile from './components/StudentProfile';
 
 function App() {
   return (
@@ -23,17 +27,21 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/courses" element={<CoursePage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/facilities" element={<FacilitiesPage />} />
+            <Route path="/facilities" element={<UserFacilities />} />
+            <Route path="/facilities-dashboard" element={<FacilitiesPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/book" element={<BookingForm />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/incidents" element={<IncidentsPage />} />
+            <Route path="/incident-management" element={<IncidentManagement />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/profile" element={<StudentProfile />} />
           </Routes>
         </main>
         <Footer />
