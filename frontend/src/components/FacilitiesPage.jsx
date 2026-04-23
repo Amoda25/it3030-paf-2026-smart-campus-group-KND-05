@@ -610,7 +610,6 @@ const FacilitiesPage = () => {
           )}
 
           {activeView === 'add' && (
-          {activeView === 'add' && (
             <div style={{ maxWidth: '1000px', margin: '0 auto' }} className="animate-fade-in">
               <form onSubmit={handleSubmit} className="glass" style={{ 
                 borderRadius: '32px', 
