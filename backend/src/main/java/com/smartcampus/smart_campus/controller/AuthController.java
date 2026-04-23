@@ -1,65 +1,29 @@
 package com.smartcampus.smart_campus.controller;
 
-import com.smartcampus.smart_campus.dto.ApiResponse;
-import com.smartcampus.smart_campus.dto.SignupRequest;
-import com.smartcampus.smart_campus.dto.LoginRequest;
-import com.smartcampus.smart_campus.model.User;
-import com.smartcampus.smart_campus.service.UserService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/auth")
-@RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173") // Vite dev server
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final UserService userService;
-
-    /**
-     * POST /api/auth/signup
-     * Accepts signup form data and saves a new user to MongoDB UniHub.users
-     */
-    @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> signup(@Valid @RequestBody SignupRequest request) {
-        try {
-            User createdUser = userService.registerUser(request);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(new ApiResponse(true, "Account created successfully! Welcome, " + createdUser.getFullName()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse(false, e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Something went wrong. Please try again."));
-        }
+    @GetMapping("/health")
+    public String healthCheck() {
+        return "ALIVE";
     }
 
-    /**
-     * POST /api/auth/login
-     * Authenticates a user and returns a success response.
-     */
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@Valid @RequestBody LoginRequest request) {
-        try {
-            User user = userService.authenticateUser(request);
-            return ResponseEntity
-                    .ok()
-                    .body(new ApiResponse(true, "Welcome back, " + user.getFullName() + "!"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Something went wrong. Please try again."));
-        }
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, Object> requestData) {
+        System.out.println("DEBUG: Reached /google endpoint with payload: " + requestData);
+        
+        return ResponseEntity.ok(Map.of(
+                "token", "test-jwt",
+                "user", Map.of(
+                        "email", "test@test.com",
+                        "role", "USER"
+                )
+        ));
     }
 }
