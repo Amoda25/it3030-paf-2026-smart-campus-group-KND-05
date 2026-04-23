@@ -8,6 +8,7 @@ import AboutUs from './components/AboutUs';
 import ContactUs from './components/ContactUs';
 import RegisterPage from './components/RegisterPage';
 import FacilitiesPage from './components/FacilitiesPage';
+import UserFacilities from './components/UserFacilities';
 import Dashboard from './components/Dashboard';
 import BookingsPage from './components/BookingsPage';
 import BookingForm from './components/BookingForm';
@@ -28,7 +29,8 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/facilities" element={<FacilitiesPage />} />
+            <Route path="/facilities" element={<UserFacilities />} />
+            <Route path="/facilities-dashboard" element={<FacilitiesPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/book" element={<BookingForm />} />

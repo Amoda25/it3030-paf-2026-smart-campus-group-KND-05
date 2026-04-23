@@ -21,7 +21,7 @@ const Dashboard = () => {
       title: "Facilities & Assets",
       description: "Comprehensive catalogue of lecture halls, labs, and specialized equipment management.",
       icon: <Building2 size={24} className="text-primary" />,
-      link: "/facilities",
+      link: "/facilities-dashboard",
       color: "rgba(59, 130, 246, 0.15)",
       accent: "#3b82f6",
       tag: "Module A"
