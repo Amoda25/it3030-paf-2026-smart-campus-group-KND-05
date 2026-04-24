@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, LogIn, UserPlus, Menu, X, ArrowRight } from 'lucide-react';
+import { Building2, Menu, X, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
@@ -38,12 +38,6 @@ const Header = () => {
 
         <div className="flex items-center gap-3">
           <div className="hidden md-flex items-center gap-3">
-             <Link to="/login" className="btn btn-outline" style={{ border: '1px solid rgba(0,0,0,0.1)', color: 'var(--text-main)', borderRadius: '99px' }}>
-                Login
-             </Link>
-             <Link to="/register" className="btn btn-primary" style={{ borderRadius: '99px' }}>
-                Register
-             </Link>
           </div>
           
           <button 
@@ -73,8 +67,6 @@ const Header = () => {
           </nav>
           <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
           <div className="flex flex-col gap-3">
-             <Link to="/login" className="btn btn-outline" style={{ width: '100%' }} onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
-             <Link to="/register" className="btn btn-white" style={{ width: '100%' }} onClick={() => setIsMobileMenuOpen(false)}>Register</Link>
           </div>
         </div>
       </div>

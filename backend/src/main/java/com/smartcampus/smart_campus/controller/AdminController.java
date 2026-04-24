@@ -1,6 +1,7 @@
 package com.smartcampus.smart_campus.controller;
 
 import com.smartcampus.smart_campus.model.User;
+import com.smartcampus.smart_campus.model.Role;
 import com.smartcampus.smart_campus.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +41,12 @@ public class AdminController {
     @PatchMapping("/users/{id}/role")
     public ResponseEntity<User> updateUserRole(@PathVariable String id, @RequestParam String role) {
         return userRepository.findById(id).map(user -> {
-            user.setRole(role);
-            return ResponseEntity.ok(userRepository.save(user));
+            try {
+                user.setRole(role.toUpperCase());
+                return ResponseEntity.ok(userRepository.save(user));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().<User>build();
+            }
         }).orElse(ResponseEntity.notFound().build());
     }
 }
