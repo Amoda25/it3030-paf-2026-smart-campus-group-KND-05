@@ -37,7 +37,7 @@ const RegisterPage = () => {
 
     try {
       // BRUTE FORCE FIX: Hardcoded absolute URL to bypass the api.js configuration
-      const response = await api.post('http://localhost:8080/api/v1/auth/register', formData);
+      const response = await api.post('http://localhost:8081/api/v1/auth/register', formData);
       const { token, user } = response.data;
 
       dispatch(loginSuccess({

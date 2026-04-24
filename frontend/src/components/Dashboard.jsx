@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, 
   CalendarRange, 
@@ -16,6 +16,50 @@ import {
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
+  const [stats, setStats] = useState({
+    totalFacilities: 0,
+    openTickets: 0,
+    activeUsers: 124 // Static placeholder for now as per design
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      const [facRes, tickRes] = await Promise.all([
+        fetch('http://localhost:8081/api/facilities'),
+        fetch('http://localhost:8081/api/tickets')
+      ]);
+
+      let facilitiesCount = 0;
+      let ticketsCount = 0;
+
+      if (facRes.ok) {
+        const facData = await facRes.json();
+        facilitiesCount = facData.length;
+      }
+
+      if (tickRes.ok) {
+        const tickData = await tickRes.json();
+        ticketsCount = tickData.filter(t => t.status === 'OPEN').length;
+      }
+
+      setStats({
+        totalFacilities: facilitiesCount,
+        openTickets: ticketsCount,
+        activeUsers: 124
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const modules = [
     {
       title: "Facilities & Assets",
@@ -153,12 +197,12 @@ const Dashboard = () => {
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10b981' }}>99.98%</div>
             </div>
             <div style={{ borderLeft: '1px solid var(--border-light)', borderRight: '1px solid var(--border-light)' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Active Users</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>124</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Active Resources</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>{loading ? '...' : stats.totalFacilities}</div>
             </div>
             <div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Open Tickets</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>12</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>{loading ? '...' : stats.openTickets}</div>
             </div>
           </div>
         </div>

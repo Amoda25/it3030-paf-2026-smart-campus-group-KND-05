@@ -26,7 +26,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable()) // Disable CSRF
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/health").permitAll() // Permit auth and health check
+                .requestMatchers("/api/v1/auth/**", "/api/facilities/**", "/api/tickets/**", "/health").permitAll() 
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

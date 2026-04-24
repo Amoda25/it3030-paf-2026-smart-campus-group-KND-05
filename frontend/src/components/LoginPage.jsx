@@ -31,7 +31,7 @@ const LoginPage = () => {
 
     try {
       // BRUTE FORCE FIX: Hardcoded absolute URL to bypass the api.js configuration
-      const response = await api.post('http://localhost:8080/api/v1/auth/login', formData);
+      const response = await api.post('http://localhost:8081/api/v1/auth/login', formData);
       const { token, user } = response.data;
 
       dispatch(loginSuccess({
@@ -54,10 +54,10 @@ const LoginPage = () => {
       const decoded = jwtDecode(credentialResponse.credential);
       console.log("Decoded JWT Payload:", decoded);
 
-      console.log("Sending token to backend: http://localhost:8080/api/v1/auth/google");
+      console.log("Sending token to backend: http://localhost:8081/api/v1/auth/google");
 
       // BRUTE FORCE FIX: Hardcoded absolute URL for Google Auth as well
-      const response = await api.post('http://localhost:8080/api/v1/auth/google', {
+      const response = await api.post('http://localhost:8081/api/v1/auth/google', {
         email: decoded.email,
         name: decoded.name,
         token: credentialResponse.credential
