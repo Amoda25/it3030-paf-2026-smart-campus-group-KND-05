@@ -22,14 +22,21 @@ public class User {
     @Id
     private String id;
 
-    private String fullName;
+    private String googleId;
 
     @Indexed(unique = true)
     private String email;
 
-    private String password;
+    private String fullName;
 
+<<<<<<< HEAD
     private Role role;
+=======
+    private String picture;
+
+    @Builder.Default
+    private Role role = Role.USER;
+>>>>>>> aad90ed84da634be45cdf9dd7cacbb827451126f
 
     @CreatedDate
     private LocalDateTime createdAt;
