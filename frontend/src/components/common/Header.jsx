@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Menu, X, ArrowRight } from 'lucide-react';
+import { Building2, Menu, X, ArrowRight, User, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -38,6 +40,23 @@ const Header = () => {
 
         <div className="flex items-center gap-3">
           <div className="hidden md-flex items-center gap-3">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                    <User size={18} />
+                  </div>
+                  <span className="text-sm font-medium">{user.email.split('@')[0]}</span>
+                </div>
+                <button onClick={logout} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+                  <LogOut size={14} className="mr-2" /> Logout
+                </button>
+              </div>
+            ) : (
+              <Link to="/" className="btn btn-primary" style={{ padding: '0.4rem 1.2rem', fontSize: '0.9rem' }}>
+                Login
+              </Link>
+            )}
           </div>
           
           <button 
@@ -67,6 +86,11 @@ const Header = () => {
           </nav>
           <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)' }} />
           <div className="flex flex-col gap-3">
+            {isAuthenticated && (
+              <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="btn btn-outline" style={{ width: '100%' }}>
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>
