@@ -55,9 +55,14 @@ const IncidentManagement = () => {
       // Map backend data to frontend format if needed
       const formattedTickets = data.map(ticket => ({
         ...ticket,
-        displayId: ticket.ticketId,
-        title: ticket.issueTitle,
-        subtitle: `${ticket.category} • ${ticket.fullName}`,
+        displayId: ticket.ticketId || 'N/A',
+        title: ticket.issueTitle || 'No Title',
+        subtitle: `${ticket.category || 'General'} • ${ticket.fullName || 'Anonymous'}`,
+        faculty: ticket.faculty || 'Not Specified',
+        location: ticket.location || 'Unknown',
+        priority: ticket.priority || 'MEDIUM',
+        status: ticket.status || 'OPEN',
+        technician: ticket.technician || 'Not Assigned'
       }));
       
       setTickets(formattedTickets);
@@ -382,6 +387,7 @@ const IncidentManagement = () => {
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Ticket ID</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Title</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Location</th>
+                <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Faculty</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Priority</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Status</th>
                 <th style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Technician</th>
@@ -398,9 +404,10 @@ const IncidentManagement = () => {
                   // Search Filtering
                   const searchLower = searchQuery.toLowerCase();
                   const matchesSearch = 
-                    ticket.displayId.toLowerCase().includes(searchLower) ||
-                    ticket.title.toLowerCase().includes(searchLower) ||
-                    ticket.location.toLowerCase().includes(searchLower);
+                    (ticket.displayId && ticket.displayId.toLowerCase().includes(searchLower)) ||
+                    (ticket.title && ticket.title.toLowerCase().includes(searchLower)) ||
+                    (ticket.location && ticket.location.toLowerCase().includes(searchLower)) ||
+                    (ticket.faculty && ticket.faculty.toLowerCase().includes(searchLower));
                   if (!matchesSearch) return false;
 
                   // Status Dropdown Filtering
@@ -416,6 +423,7 @@ const IncidentManagement = () => {
                     <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{ticket.subtitle}</div>
                   </td>
                   <td style={{ padding: '1.5rem', color: '#64748b', fontWeight: '500' }}>{ticket.location}</td>
+                  <td style={{ padding: '1.5rem', color: '#64748b', fontWeight: '600' }}>{ticket.faculty}</td>
                   <td style={{ padding: '1.5rem' }}>
                     <span style={{ 
                       padding: '0.4rem 0.8rem', 
@@ -482,7 +490,11 @@ const IncidentManagement = () => {
               if (activeTab === 'Open Tickets' && ticket.status !== 'OPEN') return false;
               if (activeTab === 'Assign Technician' && ticket.technician !== 'Not Assigned') return false;
               const searchLower = searchQuery.toLowerCase();
-              const matchesSearch = ticket.displayId.toLowerCase().includes(searchLower) || ticket.title.toLowerCase().includes(searchLower) || ticket.location.toLowerCase().includes(searchLower);
+              const matchesSearch = 
+                (ticket.displayId && ticket.displayId.toLowerCase().includes(searchLower)) ||
+                (ticket.title && ticket.title.toLowerCase().includes(searchLower)) ||
+                (ticket.location && ticket.location.toLowerCase().includes(searchLower)) ||
+                (ticket.faculty && ticket.faculty.toLowerCase().includes(searchLower));
               if (!matchesSearch) return false;
               if (statusFilter !== 'All Status' && ticket.status !== statusFilter) return false;
               return true;
@@ -503,7 +515,7 @@ const IncidentManagement = () => {
                 <div>
                   <div style={{ color: '#d97706', fontSize: '0.8rem', fontWeight: '700', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Assign Technician</div>
                   <h2 style={{ fontSize: '1.75rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.02em' }}>{selectedTicket.issueTitle || selectedTicket.title}</h2>
-                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '600' }}>{selectedTicket.ticketId} • {selectedTicket.location}</div>
+                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '600' }}>{selectedTicket.displayId} • {selectedTicket.location}</div>
                 </div>
                 <button onClick={() => setIsAssignModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '12px', color: '#475569', fontWeight: '700', cursor: 'pointer', fontSize: '0.9rem' }}>Close</button>
               </div>
@@ -565,7 +577,7 @@ const IncidentManagement = () => {
                 <div>
                   <div style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '700', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Reject Ticket</div>
                   <h2 style={{ fontSize: '1.75rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.02em' }}>{selectedTicket.issueTitle || selectedTicket.title}</h2>
-                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '600' }}>{selectedTicket.ticketId}</div>
+                  <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '600' }}>{selectedTicket.displayId}</div>
                 </div>
                 <button onClick={() => setIsRejectModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '12px', color: '#475569', fontWeight: '700', cursor: 'pointer', fontSize: '0.9rem' }}>Close</button>
               </div>
@@ -618,7 +630,7 @@ const IncidentManagement = () => {
             {/* Modal Header */}
             <div style={{ padding: '2rem', borderBottom: '1px solid #f1f5f9', position: 'relative' }}>
               <div style={{ color: '#3b82f6', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.05em', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Ticket Details</div>
-              <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#1e293b', marginBottom: '0.25rem' }}>{selectedTicket.issueTitle}</h2>
+              <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#1e293b', marginBottom: '0.25rem' }}>{selectedTicket.issueTitle || selectedTicket.title}</h2>
               <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '600' }}>{selectedTicket.displayId} • {selectedTicket.location}</div>
               
               <button 
@@ -673,10 +685,10 @@ const IncidentManagement = () => {
                       { label: 'Preferred Time', value: selectedTicket.preferredTime },
                       { label: 'Category', value: selectedTicket.category },
                       { label: 'Location', value: selectedTicket.location },
-                      { label: 'Submitted', value: new Date(selectedTicket.submittedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' }) },
+                      { label: 'Submitted', value: selectedTicket.submittedAt ? new Date(selectedTicket.submittedAt).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short' }) : 'N/A' },
                       { label: 'Technician', value: selectedTicket.technician }
                     ].map((row, i) => (
-                      <div key={i} style={{ display: 'flex', padding: '1rem 1.5rem', borderBottom: i === 6 ? 'none' : '1px solid #f1f5f9', background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                      <div key={i} style={{ display: 'flex', padding: '1rem 1.5rem', borderBottom: i === 7 ? 'none' : '1px solid #f1f5f9', background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
                         <div style={{ flex: 1, color: '#64748b', fontWeight: '600', fontSize: '0.9rem' }}>{row.label}</div>
                         <div style={{ flex: 2, color: '#1e293b', fontWeight: '700', fontSize: '0.9rem', textAlign: 'right' }}>{row.value}</div>
                       </div>
@@ -772,75 +784,6 @@ const IncidentManagement = () => {
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
                       >
                         <XCircle size={16} /> Close Ticket
-                      </button>
-                      <button 
-                        onClick={() => handleStatusUpdate('REJECTED')} 
-                        style={{ padding: '0.8rem 1.5rem', borderRadius: '12px', border: 'none', background: '#fee2e2', color: '#ef4444', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                      >
-                        Reject Ticket
-                      </button>
-                    </div>
-                  </div>
-
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
-                    <div style={{ 
-                      padding: '1.5rem', 
-                      borderRadius: '16px', 
-                      border: `1px solid ${getStatusStyle(selectedTicket.status).color}40`, 
-                      background: `${getStatusStyle(selectedTicket.status).background}` 
-                    }}>
-                      <div style={{ color: getStatusStyle(selectedTicket.status).color, fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.5rem' }}>Current Status</div>
-                      <div style={{ color: getStatusStyle(selectedTicket.status).color, fontSize: '1.2rem', fontWeight: '800' }}>{selectedTicket.status}</div>
-                    </div>
-                    <div style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid #fef3c7', background: '#fffbeb' }}>
-                      <div style={{ color: '#d97706', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.5rem' }}>Priority</div>
-                      <div style={{ color: '#78350f', fontSize: '1.2rem', fontWeight: '800' }}>{selectedTicket.priority}</div>
-                    </div>
-                    <div style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9', background: '#fff' }}>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.5rem' }}>Assigned Technician</div>
-                      <div style={{ color: '#1e293b', fontSize: '1.1rem', fontWeight: '800' }}>{selectedTicket.technician}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeModalTab === 'Comments' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                  <div style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid #f1f5f9', background: '#fff' }}>
-                    <h3 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b', marginBottom: '1.5rem' }}>Comments & Updates</h3>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                      {(selectedTicket.comments || []).length === 0 ? (
-                        <div style={{ color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center', padding: '2rem' }}>No comments yet.</div>
-                      ) : (
-                        selectedTicket.comments.map((comment, i) => (
-                          <div key={i} style={{ padding: '1rem', borderRadius: '12px', background: '#f8fafc', border: '1px solid #f1f5f9' }}>
-                            <div style={{ color: '#2563eb', fontSize: '0.7rem', fontWeight: '800', marginBottom: '0.4rem', textTransform: 'uppercase' }}>{comment.author}</div>
-                            <div style={{ color: '#1e293b', fontSize: '0.9rem', fontWeight: '500' }}>{comment.text}</div>
-                            <div style={{ color: '#94a3b8', fontSize: '0.7rem', marginTop: '0.5rem', textAlign: 'right' }}>{new Date(comment.timestamp).toLocaleString()}</div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                      <input 
-                        type="text" 
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Add a admin comment or update"
-                        style={{ flex: 1, padding: '0.85rem 1.25rem', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc', outline: 'none' }}
-                      />
-                      <button 
-                        onClick={handleAddComment}
-                        style={{ background: '#2563eb', color: '#fff', border: 'none', padding: '0.85rem 1.5rem', borderRadius: '12px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
-                      >
-                        Add Comment
                       </button>
                     </div>
                   </div>

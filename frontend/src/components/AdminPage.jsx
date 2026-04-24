@@ -43,7 +43,7 @@ const AdminPage = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/admin/stats');
+      const response = await fetch('http://localhost:8081/api/admin/stats');
       const data = await response.json();
       setStats(data);
     } catch (error) {
@@ -53,7 +53,7 @@ const AdminPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/admin/users');
+      const response = await fetch('http://localhost:8081/api/admin/users');
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -65,7 +65,7 @@ const AdminPage = () => {
 
   const updateUserRole = async (userId, newRole) => {
     try {
-      await fetch(`http://localhost:8080/api/admin/users/${userId}/role?role=${newRole}`, {
+      await fetch(`http://localhost:8081/api/admin/users/${userId}/role?role=${newRole}`, {
         method: 'PATCH'
       });
       fetchUsers();
