@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
+
+    public IncidentService(IncidentRepository incidentRepository) {
+        this.incidentRepository = incidentRepository;
+    }
 
     public List<Incident> getAllIncidents() {
         return incidentRepository.findAll();

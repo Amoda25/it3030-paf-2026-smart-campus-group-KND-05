@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class FacilityService {
 
     private final FacilityRepository facilityRepository;
+
+    public FacilityService(FacilityRepository facilityRepository) {
+        this.facilityRepository = facilityRepository;
+    }
 
     public List<Facility> getAllFacilities(String search, String type, String location) {
         if (search != null && !search.isEmpty()) {

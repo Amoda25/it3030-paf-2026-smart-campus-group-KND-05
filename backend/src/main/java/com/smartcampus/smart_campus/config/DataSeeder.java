@@ -9,10 +9,13 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 @Component
-@RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
 
     private final FacilityRepository facilityRepository;
+
+    public DataSeeder(FacilityRepository facilityRepository) {
+        this.facilityRepository = facilityRepository;
+    }
 
     @Override
     public void run(String... args) throws Exception {

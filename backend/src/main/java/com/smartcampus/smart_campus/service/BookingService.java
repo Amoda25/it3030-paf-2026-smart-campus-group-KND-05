@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class BookingService {
 
     private final BookingRepository bookingRepository;
+
+    public BookingService(BookingRepository bookingRepository) {
+        this.bookingRepository = bookingRepository;
+    }
 
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
