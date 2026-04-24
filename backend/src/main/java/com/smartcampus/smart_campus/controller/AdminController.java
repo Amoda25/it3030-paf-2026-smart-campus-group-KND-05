@@ -39,8 +39,17 @@ public class AdminController {
     @PatchMapping("/users/{id}/role")
     public ResponseEntity<User> updateUserRole(@PathVariable String id, @RequestParam Role role) {
         return userRepository.findById(id).map(user -> {
+<<<<<<< HEAD
+            try {
+                user.setRole(Role.valueOf(role.toUpperCase()));
+                return ResponseEntity.ok(userRepository.save(user));
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().<User>build();
+            }
+=======
             user.setRole(role);
             return ResponseEntity.ok(userRepository.save(user));
+>>>>>>> aad90ed84da634be45cdf9dd7cacbb827451126f
         }).orElse(ResponseEntity.notFound().build());
     }
 }

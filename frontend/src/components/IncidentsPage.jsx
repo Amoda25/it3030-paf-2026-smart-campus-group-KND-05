@@ -64,7 +64,14 @@ const IncidentsPage = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Please enter a valid email address";
+      }
+    }
     if (!formData.issueTitle.trim()) newErrors.issueTitle = "Issue title is required";
     if (formData.category === 'Select category') newErrors.category = "Please select a category";
     if (formData.faculty === 'Select faculty') newErrors.faculty = "Please select your faculty";
@@ -102,6 +109,10 @@ const IncidentsPage = () => {
     }
     if (name === 'description' && value.trim() && value.length < 10) {
       fieldError = "Please provide more details (min 10 chars)";
+    }
+    if (name === 'email' && value.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) fieldError = "Please enter a valid email address";
     }
     if (name === 'category' && value === 'Select category') fieldError = "Please select a category";
     if (name === 'faculty' && value === 'Select faculty') fieldError = "Please select your faculty";

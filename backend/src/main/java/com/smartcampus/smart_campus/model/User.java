@@ -25,9 +25,13 @@ public class User {
 
     private String fullName;
 
+<<<<<<< HEAD
+    private Role role;
+=======
     private String picture;
 
     private Role role = Role.USER;
+>>>>>>> aad90ed84da634be45cdf9dd7cacbb827451126f
 
     @CreatedDate
     private LocalDateTime createdAt;
