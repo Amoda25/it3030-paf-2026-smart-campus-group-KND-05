@@ -161,6 +161,13 @@ h1, h2, h3, h4 {
   border-color: rgba(0, 0, 0, 0.3);
 }
 
+/* Input Focus States */
+input.glass:focus {
+  border-color: var(--secondary) !important;
+  box-shadow: 0 0 0 4px rgba(var(--secondary-rgb), 0.1);
+  background: white;
+}
+
 /* Typography Enhancements */
 .gradient-text {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);

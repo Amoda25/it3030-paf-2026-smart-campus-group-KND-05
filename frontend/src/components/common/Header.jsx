@@ -52,7 +52,7 @@ const Header = () => {
                 </button>
               </div>
             ) : (
-              <Link to="/" className="btn btn-primary" style={{ padding: '0.4rem 1.2rem', fontSize: '0.9rem' }}>
+              <Link to="/login" className="btn btn-primary" style={{ padding: '0.4rem 1.2rem', fontSize: '0.9rem' }}>
                 Login
               </Link>
             )}

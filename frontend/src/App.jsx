@@ -17,6 +17,7 @@ import AdminPage from './components/AdminPage';
 import StudentProfile from './components/StudentProfile';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import OAuth2RedirectHandler from './components/auth/OAuth2RedirectHandler';
+import LoginPage from './components/auth/LoginPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/courses" element={<CoursePage />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />

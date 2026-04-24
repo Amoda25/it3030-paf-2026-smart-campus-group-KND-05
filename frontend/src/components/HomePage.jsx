@@ -22,7 +22,8 @@ import {
   Star,
   Clock,
   Calendar,
-  Box
+  Box,
+  LogIn
 } from 'lucide-react';
 import campusHero from '../assets/sliit_campus.png';
 import graduate1 from '../assets/graduate1.png';
@@ -31,7 +32,6 @@ import graduate3 from '../assets/graduate3.png';
 import facilitiesHero from '../assets/facilities_hero.png';
 import resourceBlue from '../assets/blue_resource.png';
 import systemsBlue from '../assets/blue_systems.png';
-import GoogleLoginButton from './auth/GoogleLoginButton';
 import { useAuth } from '../context/AuthContext';
 
 const HomePage = () => {
@@ -150,7 +150,9 @@ const HomePage = () => {
             </p>
             <div className="flex items-center gap-4">
               {!isAuthenticated ? (
-                <GoogleLoginButton />
+                <Link to="/login" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(242, 106, 0, 0.4)' }}>
+                  Login to UniHub <LogIn size={18} style={{ marginLeft: '8px' }} />
+                </Link>
               ) : (
                 <Link to="/dashboard" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1rem', boxShadow: '0 8px 25px rgba(242, 106, 0, 0.4)' }}>
                   Go to Dashboard <LayoutDashboard size={18} style={{ marginLeft: '8px' }} />
