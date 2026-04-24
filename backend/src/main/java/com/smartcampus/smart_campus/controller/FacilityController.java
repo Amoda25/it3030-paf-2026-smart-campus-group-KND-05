@@ -36,4 +36,16 @@ public class FacilityController {
     public ResponseEntity<Facility> createFacility(@RequestBody Facility facility) {
         return ResponseEntity.ok(facilityService.saveFacility(facility));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Facility> updateFacility(@PathVariable String id, @RequestBody Facility facility) {
+        facility.setId(id);
+        return ResponseEntity.ok(facilityService.saveFacility(facility));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFacility(@PathVariable String id) {
+        facilityService.deleteFacility(id);
+        return ResponseEntity.noContent().build();
+    }
 }
