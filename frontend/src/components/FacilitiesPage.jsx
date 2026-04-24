@@ -36,7 +36,9 @@ import {
   FileText,
   Dumbbell,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -61,6 +63,7 @@ const FacilitiesPage = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const validateForm = () => {
     let newErrors = {};
@@ -143,14 +146,18 @@ const FacilitiesPage = () => {
         availabilityWindows: ["08:00-17:00"] // Default availability as expected by backend
       };
       
-      const response = await fetch('http://localhost:8081/api/facilities', {
-        method: 'POST',
+      const url = editingId 
+        ? `http://localhost:8081/api/facilities/${editingId}`
+        : 'http://localhost:8081/api/facilities';
+        
+      const response = await fetch(url, {
+        method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        alert("🎉 Success! Facility registered correctly.");
+        alert(editingId ? "🎉 Success! Facility updated correctly." : "🎉 Success! Facility registered correctly.");
         setShowSuccessModal(true);
         setFormData({ 
           name: '', 
@@ -161,6 +168,7 @@ const FacilitiesPage = () => {
           description: '', 
           imageUrl: '' 
         });
+        setEditingId(null);
         setErrors({});
         fetchFacilities();
         setTimeout(() => {
@@ -168,19 +176,55 @@ const FacilitiesPage = () => {
           setActiveView('inventory');
         }, 5000);
       } else {
-        let errorMessage = 'Failed to register facility';
+        let errorMessage = editingId ? 'Failed to update facility' : 'Failed to register facility';
         try {
           const errorText = await response.text();
           if (errorText) errorMessage = errorText;
         } catch (e) { }
-        alert("❌ Failed to register: " + errorMessage);
+        alert("❌ Failed: " + errorMessage);
       }
     } catch (error) {
-      console.error('Error adding facility:', error);
+      console.error('Error saving facility:', error);
       alert("CRITICAL ERROR: " + error.message + "\n\n1. Ensure your backend is running on port 8081.");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this facility? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8081/api/facilities/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        alert("Facility deleted successfully.");
+        fetchFacilities();
+      } else {
+        alert("Failed to delete facility.");
+      }
+    } catch (error) {
+      console.error("Error deleting facility:", error);
+      alert("Error connecting to backend.");
+    }
+  };
+
+  const handleEdit = (fac) => {
+    setFormData({
+      name: fac.name,
+      type: fac.type,
+      capacity: fac.capacity.toString(),
+      location: fac.location,
+      status: fac.status,
+      description: fac.description || '',
+      imageUrl: fac.imageUrl || ''
+    });
+    setEditingId(fac.id);
+    setActiveView('add');
   };
 
   const categories = ['All', 'Lecture Hall', 'Lab', 'Gym', 'Meeting Room', 'Studios', 'Equipment'];
@@ -218,7 +262,7 @@ const FacilitiesPage = () => {
   // Sidebar Items
   const sidebarItems = [
     { id: 'overview', label: 'Overview', icon: <Activity size={20} /> },
-    { id: 'inventory', label: 'Assets Inventory', icon: <Package size={20} /> },
+    { id: 'inventory', label: 'Inventory Management', icon: <Package size={20} /> },
     { id: 'add', label: 'Add New Facility', icon: <PlusCircle size={20} /> },
     { id: 'maintenance', label: 'Maintenance Log', icon: <ClipboardList size={20} /> },
   ];
@@ -323,7 +367,13 @@ const FacilitiesPage = () => {
             {sidebarItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => setActiveView(item.id)}
+                onClick={() => {
+                  setActiveView(item.id);
+                  if (item.id === 'add') {
+                    setEditingId(null);
+                    setFormData({ name: '', type: 'Lecture Hall', capacity: '', location: '', status: 'ACTIVE', description: '', imageUrl: '' });
+                  }
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -369,13 +419,13 @@ const FacilitiesPage = () => {
           <div>
             <h1 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>
               {activeView === 'overview' && 'Facilities Overview'}
-              {activeView === 'inventory' && 'Asset Inventory'}
+              {activeView === 'inventory' && 'Inventory Management'}
               {activeView === 'add' && 'Facility Registration'}
               {activeView === 'maintenance' && 'Maintenance Log'}
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
               {activeView === 'overview' && 'Monitor and manage campus resources in real-time.'}
-              {activeView === 'inventory' && 'Search and browse through all registered campus assets.'}
+              {activeView === 'inventory' && 'Search, update or remove registered campus assets.'}
               {activeView === 'add' && 'Deploy new operational nodes to the campus network.'}
               {activeView === 'maintenance' && 'Track and schedule facility maintenance cycles.'}
             </p>
@@ -471,21 +521,6 @@ const FacilitiesPage = () => {
                           <div style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: '800', background: fac.status === 'ACTIVE' ? '#dcfce7' : '#fef3c7', color: fac.status === 'ACTIVE' ? '#15803d' : '#92400e' }}>
                             {fac.status}
                           </div>
-                          <Link 
-                            to="/book" 
-                            state={{ resourceName: fac.name, resourceType: fac.type }}
-                            style={{ 
-                              padding: '4px 12px', 
-                              borderRadius: '8px', 
-                              background: 'var(--primary)', 
-                              color: '#fff', 
-                              fontSize: '0.7rem', 
-                              fontWeight: '700',
-                              textDecoration: 'none'
-                            }}
-                          >
-                            Book Now
-                          </Link>
                         </div>
                       </div>
                     ))}
@@ -577,23 +612,49 @@ const FacilitiesPage = () => {
                             </div>
                           </div>
                           
-                          <Link 
-                            to="/book" 
-                            state={{ resourceName: fac.name, resourceType: fac.type }}
-                            className="btn btn-primary"
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
+                          <button 
+                            onClick={() => handleEdit(fac)} 
                             style={{ 
-                              padding: '8px 16px', 
+                              flex: 1, 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              gap: '0.5rem', 
+                              padding: '8px', 
                               borderRadius: '10px', 
+                              border: '1px solid #e2e8f0', 
+                              background: '#fff', 
+                              color: '#64748b', 
                               fontSize: '0.8rem', 
-                              fontWeight: '700',
-                              textDecoration: 'none',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
+                              fontWeight: '700', 
+                              cursor: 'pointer' 
                             }}
                           >
-                            Book Now
-                          </Link>
+                            <Edit size={14} /> Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(fac.id)} 
+                            style={{ 
+                              flex: 1, 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              gap: '0.5rem', 
+                              padding: '8px', 
+                              borderRadius: '10px', 
+                              border: 'none', 
+                              background: '#fee2e2', 
+                              color: '#ef4444', 
+                              fontSize: '0.8rem', 
+                              fontWeight: '700', 
+                              cursor: 'pointer' 
+                            }}
+                          >
+                            <Trash2 size={14} /> Delete
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -633,10 +694,10 @@ const FacilitiesPage = () => {
                         margin: '0 auto 1.5rem',
                         boxShadow: '0 15px 30px -10px rgba(59, 130, 246, 0.5)'
                     }}>
-                        <Plus size={32} />
+                        {editingId ? <Edit size={32} /> : <Plus size={32} />}
                     </div>
-                    <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>Deploy New Asset</h2>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Configure and register a new operational node to the campus infrastructure.</p>
+                    <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>{editingId ? 'Update Operational Node' : 'Deploy New Asset'}</h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>{editingId ? 'Modify existing configuration for this campus asset.' : 'Configure and register a new operational node to the campus infrastructure.'}</p>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
@@ -809,12 +870,12 @@ const FacilitiesPage = () => {
                         {submitting ? (
                             <>
                                 <div className="loading-spinner" style={{ width: '20px', height: '20px', border: '3px solid rgba(255,255,255,0.3)', borderTop: '3px solid #fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
-                                Deploying Node...
+                                {editingId ? 'Updating Node...' : 'Deploying Node...'}
                             </>
                         ) : (
                             <>
                                 <ShieldCheck size={22} />
-                                Complete Registration
+                                {editingId ? 'Save Changes' : 'Complete Registration'}
                             </>
                         )}
                     </button>
