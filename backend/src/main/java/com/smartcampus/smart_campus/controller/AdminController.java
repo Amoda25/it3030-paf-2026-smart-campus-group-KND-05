@@ -29,7 +29,7 @@ public class AdminController {
         stats.put("totalFacilities", facilityRepository.count());
         stats.put("activeBookings", bookingRepository.findAll().size()); // Simplified
         stats.put("openIncidents", incidentRepository.findByStatus("OPEN").size());
-        stats.put("activeTechnicians", userRepository.findAll().stream().filter(u -> "TECHNICIAN".equals(u.getRole())).count());
+        stats.put("activeTechnicians", userRepository.findAll().stream().filter(u -> Role.TECHNICIAN.equals(u.getRole())).count());
         return ResponseEntity.ok(stats);
     }
 
@@ -41,12 +41,17 @@ public class AdminController {
     @PatchMapping("/users/{id}/role")
     public ResponseEntity<User> updateUserRole(@PathVariable String id, @RequestParam String role) {
         return userRepository.findById(id).map(user -> {
+<<<<<<< HEAD
             try {
                 user.setRole(role.toUpperCase());
                 return ResponseEntity.ok(userRepository.save(user));
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.badRequest().<User>build();
             }
+=======
+            user.setRole(Role.valueOf(role.toUpperCase()));
+            return ResponseEntity.ok(userRepository.save(user));
+>>>>>>> db8918fe225b4ee326d5b1a6240e8dd2431d7a0a
         }).orElse(ResponseEntity.notFound().build());
     }
 }

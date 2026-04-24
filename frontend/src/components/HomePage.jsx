@@ -38,44 +38,44 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [campusHero, graduate1, graduate2, graduate3];
 
+  const [popularFacilities, setPopularFacilities] = useState([]);
+  const [loadingFacilities, setLoadingFacilities] = useState(true);
+
   useEffect(() => {
     setIsVisible(true);
+    fetchPopularFacilities();
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(timer);
   }, [slides.length]);
 
+  const fetchPopularFacilities = async () => {
+    try {
+      const response = await fetch('http://localhost:8081/api/facilities');
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new TypeError("Oops, we haven't got JSON!");
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        const active = data.filter(f => f.status === 'ACTIVE').slice(0, 3);
+        setPopularFacilities(active);
+      }
+    } catch (error) {
+      console.error('Error fetching facilities:', error);
+      setPopularFacilities([]); // Fallback to empty list
+    } finally {
+      setLoadingFacilities(false);
+    }
+  };
+
   const handleBookResource = (type, name) => {
     navigate('/book', { state: { resourceType: type, resourceName: name } });
   };
-
-  const popularFacilities = [
-    {
-      id: 1,
-      name: "Main Auditorium",
-      description: "State-of-the-art 500-seat theater for events and lectures.",
-      image: facilitiesHero,
-      rating: 4.9,
-      type: "lecture-hall"
-    },
-    {
-      id: 2,
-      name: "Innovation Lab",
-      description: "Equipped with 3D printers, VR kits, and high-performance computing.",
-      image: resourceBlue,
-      rating: 4.8,
-      type: "lab"
-    },
-    {
-      id: 3,
-      name: "Smart Study Pods",
-      description: "Private, soundproof pods with high-speed Wi-Fi and climate control.",
-      image: systemsBlue,
-      rating: 4.7,
-      type: "study-room"
-    }
-  ];
 
   const announcements = [
     {
@@ -168,32 +168,47 @@ const HomePage = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2.5rem' }}>
-            {popularFacilities.map((facility) => (
-              <div key={facility.id} className="feature-card glass" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
-                  <img src={facility.image} alt={facility.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
-                  <div style={{ position: 'absolute', top: '1rem', right: '1rem', padding: '0.5rem 1rem', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', color: 'white', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Star size={14} style={{ color: '#fbbf24' }} /> {facility.rating}
-                  </div>
-                </div>
-                <div style={{ padding: '2rem' }}>
-                  <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{facility.name}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: 1.6 }}>{facility.description}</p>
-                  <div className="flex justify-between items-center">
-                    <button 
-                      className="btn btn-primary" 
-                      style={{ padding: '0.6rem 1.5rem' }}
-                      onClick={() => handleBookResource(facility.type, facility.name)}
-                    >
-                      Book Now
-                    </button>
-                    <Link to="/facilities" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none' }}>
-                      Details
-                    </Link>
-                  </div>
-                </div>
+            {loadingFacilities ? (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem' }}>
+                <div style={{ border: '4px solid #f3f3f3', borderTop: '4px solid var(--primary)', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1.5rem' }}></div>
+                <p style={{ color: 'var(--text-muted)' }}>Fetching latest campus resources...</p>
               </div>
-            ))}
+            ) : popularFacilities.length > 0 ? (
+              popularFacilities.map((facility) => (
+                <div key={facility.id} className="feature-card glass" style={{ padding: 0, overflow: 'hidden' }}>
+                  <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
+                    <img src={facility.imageUrl || facilitiesHero} alt={facility.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
+                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', padding: '0.5rem 1rem', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', color: 'white', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Star size={14} style={{ color: '#fbbf24' }} /> {facility.rating || '4.5'}
+                    </div>
+                  </div>
+                  <div style={{ padding: '2rem' }}>
+                    <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>{facility.name}</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2rem', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {facility.description || "Premium campus space equipped with modern amenities for an enhanced learning experience."}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ padding: '0.6rem 1.5rem' }}
+                        onClick={() => handleBookResource(facility.type, facility.name)}
+                      >
+                        Book Now
+                      </button>
+                      <Link to="/facilities" style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none' }}>
+                        Details
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', background: 'rgba(255,255,255,0.05)', borderRadius: '24px' }}>
+                <Box size={48} style={{ color: 'var(--text-muted)', opacity: 0.3, margin: '0 auto 1rem' }} />
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '700' }}>No facilities listed yet</h3>
+                <p style={{ color: 'var(--text-muted)' }}>Check back later for updated campus resources.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

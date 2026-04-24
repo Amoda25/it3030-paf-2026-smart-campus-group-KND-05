@@ -72,7 +72,11 @@ public class TicketService {
             changed = true;
         }
         
-        return ticketRepository.save(ticket);
+        if (changed) {
+            return ticketRepository.save(ticket);
+        }
+        
+        return ticket;
     }
 
     public Ticket addComment(String ticketId, Ticket.Comment comment) {
